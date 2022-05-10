@@ -1,13 +1,39 @@
 version: '3'
 
 services:
+  db:
+    container_name: db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - .env
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    healthcheck:
+      test:
+        [
+            "CMD-SHELL", "pg_isready -d $POSTGRES_DB -U $POSTGRES_USER"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   app:
     build: .
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
     env_file:
       - .env
       - .secrets
     command: bash -c "
-      uvicorn the_app.main:app
+      uvicorn gringotts.main:app
       --host 0.0.0.0 --port 8080
       --lifespan=on --use-colors --loop uvloop --http httptools
       --reload --log-level debug
@@ -15,31 +41,11 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8080:8080
-    depends_on:
-      - db
-
-  db:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - .env
-      - .secrets
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=${SQL_USER}
-    healthcheck:
-      test:
-        [
-            "CMD-SHELL", "pg_isready -d $SQL_DB -U $SQL_USER"
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - 8283:8080
+ 
+networks:
+  default:
+    name: gringotts-network
 
 volumes:
   postgres_data:

@@ -1,5 +1,5 @@
 # Pull base image
-FROM python:3.10-slim-buster as builder
+FROM python:3.8.13-buster as builder
 
 # Set environment variables
 COPY requirements.txt requirements.txt
@@ -12,7 +12,7 @@ RUN set -ex && pip install -r requirements.txt
 
 FROM builder as final
 WORKDIR /app
-COPY ./the_app/ /app/
+COPY ./gringotts/ /app/
 COPY ./tests/ /app/
 COPY .env /app/
 

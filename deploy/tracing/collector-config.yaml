@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  jaeger:
+    endpoint: "jaeger:14250"
+    tls:
+      insecure: true
+  otlp/digma:
+    endpoint: ${OTLP_EXPORTER_DIGMA_COLLECTOR_API}
+    tls:
+      insecure: true
+       
+processors:
+  batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp/digma, jaeger]
+      processors: [batch]

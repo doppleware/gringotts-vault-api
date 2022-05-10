@@ -1,0 +1,15 @@
+
+POST http://localhost:8000/v1/moneytransfer/transfer HTTP/1.1
+content-type: application/json
+
+{
+    "source_account": "bob",
+    "target_account": "bill",
+    "executing_user": "bob", 
+    "amount": 20
+
+}
+
+###
+
+http://localhost:8000/v1/nonsense/test

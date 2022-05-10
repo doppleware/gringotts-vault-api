@@ -1,0 +1,27 @@
+version: "3.6"
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "14250"
+      - "0.0.0.0:14268:14268"
+
+  collector:
+    image: otel/opentelemetry-collector:0.48.0
+    command: ["--config=/otel-local-config.yaml"]
+    volumes:
+      - ./collector-config.yaml:/otel-local-config.yaml
+    ports:
+      - "0.0.0.0:4317:4317" # OTLP receiver
+    depends_on:
+      - jaeger
+    environment:
+      - OTLP_EXPORTER_DIGMA_COLLECTOR_API=host.docker.internal:5050
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  default:
+    name: gringotts-network

@@ -3,7 +3,7 @@ import asyncio
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from the_app.models.base import Base as app_base
+from gringotts.models.base import Base as app_base
 
 target_metadata = app_base.metadata
 

@@ -1,9 +1,9 @@
-DROP DATABASE IF EXISTS devdb;
-CREATE DATABASE devdb;
+SELECT 'CREATE DATABASE devdb'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'devdb')\gexec
 \connect devdb;
-CREATE SCHEMA shakespeare;
+CREATE SCHEMA gringotts;
 
-DROP DATABASE IF EXISTS testdb;
-CREATE DATABASE testdb;
-\connect testdb;
-CREATE SCHEMA shakespeare;
+SELECT 'CREATE DATABASE testdb'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'testdb')\gexec\connect testdb;
+DROP SCHEMA IF EXISTS gringotts;
+CREATE SCHEMA gringotts;
