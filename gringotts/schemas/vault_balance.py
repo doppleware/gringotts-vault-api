@@ -11,3 +11,6 @@ class VaultBalanceResponse(BaseModel):
     muggle_currency_value: float
     muggle_currency_code: Optional[str] = None
 
+
+class VaultAppraisalRequest(BaseModel):
+    vault_id: int

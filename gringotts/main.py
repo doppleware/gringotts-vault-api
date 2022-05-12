@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from opentelemetry.instrumentation.digma import DigmaConfiguration
 
 from gringotts.api.vault_service import router as vault_router
+from gringotts.config import get_settings
 from gringotts.database import engine
 from gringotts.models.base import Base
 from gringotts.utils import get_logger
@@ -25,7 +26,7 @@ app.include_router(vault_router)
 resource = Resource.create(attributes={SERVICE_NAME: 'vault_service'})
 resource = DigmaConfiguration().trace_this_package()\
                     .set_environment("Dev").resource.merge(resource)
-exporter = OTLPSpanExporter(endpoint='localhost:4317', insecure=True)
+exporter = OTLPSpanExporter(endpoint=get_settings().otlp_exporter_url, insecure=True)
 provider = TracerProvider(resource=resource)
 provider.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(provider)

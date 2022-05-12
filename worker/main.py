@@ -1,6 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv(verbose=True)
 import asyncio
+import pathlib
 import pika, sys, os
 from pika.credentials import PlainCredentials
+from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.instrumentation.pika import PikaInstrumentor
 from opentelemetry.sdk.resources import Resource, SERVICE_NAME
 from opentelemetry.sdk.trace import TracerProvider
@@ -8,31 +12,30 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 
+from config import get_settings
+from goblin_worker import goblins_wait_for_work
+
+
 def main():
 
 
+
     resource = Resource.create(attributes={SERVICE_NAME: 'vault_services'})
-    exporter = OTLPSpanExporter(endpoint='localhost:4317', insecure=True)
+    exporter = OTLPSpanExporter(endpoint=get_settings().otlp_exporter_url, insecure=True)
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(BatchSpanProcessor(exporter))
     trace.set_tracer_provider(provider)
     pika_instrumentation = PikaInstrumentor()
-    cr =PlainCredentials('admin', 'admin')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost', credentials=cr))
+    Psycopg2Instrumentor().instrument()
+    cr =PlainCredentials(get_settings().rabbit_user, get_settings().rabbit_pass)
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=get_settings().rabbit_host, credentials=cr))
     channel = connection.channel()
     pika_instrumentation.instrument_channel(channel=channel)
+    channel.queue_declare(queue='appraisal_requests')
+    goblins_wait_for_work(channel)
 
-    channel.queue_declare(queue='moneytransfersqueue')
 
-    def callback(ch, method, properties, body):
-        tracer = trace.get_tracer(__name__)
-        with tracer.start_as_current_span("processing order"):
-            asyncio.sleep(2)
-            print(" [x] Received %r" % body)
-
-    channel.basic_consume(queue='moneytransfersqueue', on_message_callback=callback, auto_ack=True)
-
-    channel.start_consuming()
 
 if __name__ == '__main__':
     try:

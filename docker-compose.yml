@@ -1,6 +1,19 @@
 version: '3'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - rabbitmq_gt_data:/var/lib/rabbitmq/
+      - rabbitmq_gt_log:/var/log/rabbitmq/
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    profiles: ["develop","standalone"]
+
   db:
     container_name: db
     environment:
@@ -12,7 +25,7 @@ services:
       context: ./db
       dockerfile: Dockerfile
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_gt_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     profiles: ["develop","standalone"]
@@ -25,6 +38,30 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  worker:
+    build: ./worker
+    profiles: ["standalone"]
+
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+      - RABBITMQ=db
+
+    env_file:
+      - .env
+    command: bash -c "
+      uvicorn gringotts.main:app
+      --host 0.0.0.0 --port 8080
+      --lifespan=on --use-colors --loop uvloop --http httptools
+      --reload --log-level debug
+      "
+    volumes:
+      - .:/app
+    ports:
+      - 8283:8080
+      -
   app:
     build: .
     profiles: ["standalone"]
@@ -35,7 +72,6 @@ services:
       - POSTGRES_HOST=db
     env_file:
       - .env
-      - .secrets
     command: bash -c "
       uvicorn gringotts.main:app
       --host 0.0.0.0 --port 8080
@@ -52,4 +88,6 @@ networks:
     name: gringotts-network
 
 volumes:
-  postgres_data:
+  postgres_gt_data:
+  rabbitmq_gt_data:
+  rabbitmq_gt_log:

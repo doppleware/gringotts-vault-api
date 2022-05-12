@@ -1,6 +1,8 @@
+import datetime
 import json
 from enum import Enum
 from typing import Dict
+from queueing import get_channel
 
 from httpx import AsyncClient
 from opentelemetry import trace
@@ -9,7 +11,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from gringotts.config import get_settings
 from gringotts.models.vault_ledger import VaultLedger
 from gringotts.schemas.vault_balance import VaultBalanceResponse
+from waiting import wait
+
 tracer = trace.get_tracer(__name__)
+
+LEDGER_EXPIRATION_IN_DAYS = 10
+
+
+class LedgerExpiredException(Exception):
+    def __init__(self):
+        pass
 
 
 class MuggleCurrencies(Enum):
@@ -32,13 +43,24 @@ async def get_muggle_exchange_rates(currency_code: str):
             return muggle_exchange_rate
 
 
-async def get_latest_vault_appraisal(db_session: AsyncSession, vault_number:int, muggle_currency_code: str ):
+def ledger_expired(ledger: VaultLedger) -> bool:
+    if not ledger.last_appraised:
+        return True
+    delta: datetime.timedelta = (datetime.datetime.now() - ledger.last_appraised)
+    return delta.total_seconds() > LEDGER_EXPIRATION_IN_DAYS * 86400
+
+
+async def get_latest_vault_appraisal(db_session: AsyncSession, vault_number: int, muggle_currency_code: str):
     with tracer.start_as_current_span("Getting latest appraisal for vault"):
 
         ledger: VaultLedger = await VaultLedger.find_by_vault_id(db_session, vault_number)
+
+        if (not ledger) or ledger_expired(ledger):
+            raise LedgerExpiredException()
+
         muggle_money_value = -1
         if muggle_currency_code:
-            muggle_money_value = await get_muggle_money_value(ledger,muggle_currency_code.upper())
+            muggle_money_value = await get_muggle_money_value(ledger, muggle_currency_code.upper())
 
         return VaultBalanceResponse(vault_number=vault_number, galleons=ledger.galleons,
                                     sickles=ledger.sickles,
@@ -47,11 +69,10 @@ async def get_latest_vault_appraisal(db_session: AsyncSession, vault_number:int,
                                     muggle_currency_code=muggle_currency_code)
 
 
-async def get_muggle_money_value(ledger:VaultLedger, muggle_currency_code:str):
-
+async def get_muggle_money_value(ledger: VaultLedger, muggle_currency_code: str):
     with tracer.start_as_current_span("Calculating muggle value of vault"):
         # Goblins can be thorough...
-        exchange : Dict[str,Dict]= {}
+        exchange: Dict[str, Dict] = {}
         for currency in MuggleCurrencies:
             exchange[currency.name] = await get_muggle_exchange_rates(currency.name)
 
@@ -59,3 +80,9 @@ async def get_muggle_money_value(ledger:VaultLedger, muggle_currency_code:str):
                              ledger.sickles * exchange[muggle_currency_code]["sickles"] + \
                              ledger.knuts * exchange[muggle_currency_code]["knuts"]
         return muggle_money_value
+
+
+async def request_vault_appraisal(vault_number: int):
+    get_channel('appraisal_requests')\
+        .basic_publish(exchange='', routing_key='appraisal_requests', body=str(vault_number))
+
