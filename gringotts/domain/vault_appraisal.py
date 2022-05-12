@@ -6,6 +6,7 @@ from httpx import AsyncClient
 from opentelemetry import trace
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from gringotts.config import get_settings
 from gringotts.models.vault_ledger import VaultLedger
 from gringotts.schemas.vault_balance import VaultBalanceResponse
 tracer = trace.get_tracer(__name__)
@@ -24,7 +25,7 @@ async def get_muggle_exchange_rates(currency_code: str):
         async with AsyncClient(
                 headers={"Content-Type": "application/json"},
         ) as client:
-            response = await client.get(config.get_settings().muggle_exchange_api)
+            response = await client.get(get_settings().muggle_exchange_api)
             exchange_rates_list = json.loads(response.text)
             muggle_exchange_rate = \
                 next((e for e in exchange_rates_list if e["currency_code"] == currency_code.upper()), None)
