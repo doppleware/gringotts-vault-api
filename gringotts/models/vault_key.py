@@ -1,12 +1,9 @@
 from opentelemetry import trace
-import uuid
-
-from fastapi import HTTPException, status
-from sqlalchemy import Column, Integer, String, select
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from gringotts.models.base import Base
 from sqlalchemy.orm import relationship
+
+from gringotts.models.base import Base
 
 tracer = trace.get_tracer(__name__)
 

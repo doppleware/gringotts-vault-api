@@ -1,6 +1,10 @@
+from fastapi import Depends
 from opentelemetry import trace
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from gringotts.authentication.keysmith import decypher_access_token, create_access_token
+from gringotts.database import get_db
 from gringotts.models.vault import Vault
 from gringotts.models.vault_owner import VaultOwner
 from gringotts.models.vault_key import VaultKey
@@ -12,6 +16,21 @@ tracer = trace.get_tracer(__name__)
 class CreatureNotAuthenticatedException(Exception):
     def __init__(self, reason: str):
         self.reason = reason
+
+
+class VaultOwnerAccess(BaseModel):
+    vault_owner: str
+    vault_number: int
+
+
+async def get_owner_access(db_session: AsyncSession = Depends(get_db), token: dict = Depends(decypher_access_token)):
+    vault_owner_name = token["vault_owner"]
+    vault_owner: VaultOwner = await VaultOwner.find(db_session, username=vault_owner_name)
+    return VaultOwnerAccess(vault_owner=vault_owner_name, vault_number=vault_owner.vault_id)
+
+
+async def create_vault_owner_api_key(vault_owner: VaultOwner):
+    return create_access_token({"vault_owner": vault_owner.username})
 
 
 async def validate_vault_owner_and_key(db_session: AsyncSession, request: AuthenticationRequest):
@@ -40,7 +59,7 @@ async def validate_vault_owner_and_key(db_session: AsyncSession, request: Authen
 
 async def search_for_key_record(db_session: AsyncSession, key: str):
     # Purposely inefficient... job security?
-    with tracer.start_as_current_span("Retrieivng the key record"):
+    with tracer.start_as_current_span("Retrieiving the key record"):
         keys = await VaultKey.all(db_session)
         found_key = None
         for key in keys:

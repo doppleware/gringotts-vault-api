@@ -23,13 +23,14 @@ app = FastAPI(title="Gringotts Vault API", version="0.3")
 app.include_router(vault_router)
 
 resource = Resource.create(attributes={SERVICE_NAME: 'vault_service'})
+resource = DigmaConfiguration().trace_this_package()\
+                    .set_environment("Dev").resource.merge(resource)
 exporter = OTLPSpanExporter(endpoint='localhost:4317', insecure=True)
 provider = TracerProvider(resource=resource)
 provider.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(provider)
 
-resource = DigmaConfiguration().trace_this_package()\
-                    .set_environment("Dev").resource.merge(resource)
+
 RequestsInstrumentor().instrument()
 LoggingInstrumentor().instrument(set_logging_format=True)
 AsyncPGInstrumentor().instrument()
