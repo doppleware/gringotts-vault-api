@@ -18,10 +18,8 @@ services:
     depends_on:
       - jaeger
     environment:
-      - OTLP_EXPORTER_DIGMA_COLLECTOR_API=host.docker.internal:5050
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - OTLP_EXPORTER_DIGMA_COLLECTOR_API=digma-collector-api:5050
 
 networks:
   default:
-    name: gringotts-network
+    name: tracing-network

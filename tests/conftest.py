@@ -1,8 +1,11 @@
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy import event
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncConnection
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.ddl import CreateSchema, DropSchema
+
 from gringotts.database import engine
 from gringotts.main import app
 from gringotts.models.base import Base
@@ -24,7 +27,9 @@ def pytest_addoption(parser):
 
 async def start_db():
     async with engine.begin() as conn:
-        conn = await conn.execution_options(schema_translate_map={None: "gringotts"})
+        await conn.execute(DropSchema('gringotts', cascade=True))
+        await conn.execute(CreateSchema('gringotts'))
+        conn: AsyncConnection = await conn.execution_options(schema_translate_map={None: "gringotts"})
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
@@ -38,7 +43,7 @@ async def start_db():
 async def client(request) -> AsyncClient:
     async with AsyncClient(
             app=app,
-            base_url="http://testserver/v1",
+            base_url="http://testserver",
             headers={"Content-Type": "application/json"},
     ) as client:
         await start_db()

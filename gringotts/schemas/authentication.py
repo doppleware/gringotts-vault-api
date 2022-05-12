@@ -19,12 +19,7 @@ class TokenResponse(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    vault_owner: Optional[str] = None
 
 
-class User(BaseModel):
-    username: str
-    email: Optional[str] = None
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = None
 
