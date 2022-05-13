@@ -12,6 +12,13 @@ jobs:
       fail-fast: false
 
     services:
+      rabbitmq:
+        image: rabbitmq
+        env:
+          RABBITMQ_DEFAULT_USER: admin
+          RABBITMQ_DEFAULT_PASS: admin
+        ports:
+          - 5672:5672
       sqldb:
         image: postgres:13
         env:
