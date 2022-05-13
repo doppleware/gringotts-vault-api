@@ -1,8 +1,31 @@
 version: '3'
 
 services:
-  db:
-    container_name: db
+
+  gt-rabbitmq:
+    profiles: [ "develop","standalone","test" ]
+    container_name: gt-rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - rabbitmq_gt_data:/var/lib/rabbitmq/
+      - rabbitmq_gt_log:/var/log/rabbitmq/
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    env_file:
+      - .env
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  gt-vault-db:
+    profiles: [ "develop","standalone","test" ]
+    container_name: gt-vault-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -12,11 +35,9 @@ services:
       context: ./db
       dockerfile: Dockerfile
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_gt_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-    profiles: ["develop","standalone"]
-
     healthcheck:
       test:
         [
@@ -25,17 +46,39 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  app:
-    build: .
-    profiles: ["standalone"]
 
+  gt-goblin-worker:
+    profiles: [ "standalone" ]
+    container_name: gt-goblin-worker
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
     depends_on:
-      - db
+      - gt-vault-db
+      - gt-rabbitmq
     environment:
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=gt-vault-db
+      - RABBITMQ_HOST=gt-rabbitmq
+      - OTLP_EXPORTER_URL=host.docker.internal:4317
     env_file:
       - .env
-      - .secrets
+    command: bash -c "
+      python ./main.py
+      "
+
+  gt-vault-api:
+    build: .
+    profiles: ["standalone", "test"]
+    container_name: gt-vault-api
+    depends_on:
+      - gt-vault-db
+      - gt-rabbitmq
+    environment:
+      - POSTGRES_HOST=gt-vault-db
+      - OTLP_EXPORTER_URL=host.docker.internal:4317
+      - RABBITMQ_HOST=gt-rabbitmq
+    env_file:
+      - .env
     command: bash -c "
       uvicorn gringotts.main:app
       --host 0.0.0.0 --port 8080
@@ -46,10 +89,14 @@ services:
       - .:/app
     ports:
       - 8283:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
  
 networks:
   default:
     name: gringotts-network
 
 volumes:
-  postgres_data:
+  postgres_gt_data:
+  rabbitmq_gt_data:
+  rabbitmq_gt_log:

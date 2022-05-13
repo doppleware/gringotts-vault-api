@@ -1,5 +1,5 @@
 
-name: Unit Tests
+name: Integration Tests
 
 on: [pull_request]
 
@@ -8,10 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: [ "3.8", "3.9", "3.10"]
       fail-fast: false
 
     services:
+      rabbitmq:
+        image: rabbitmq:latest
+        env:
+          RABBITMQ_DEFAULT_USER: admin
+          RABBITMQ_DEFAULT_PASS: admin
+        ports:
+          - 15672:15672
+          - 5672:5672
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+
       sqldb:
         image: postgres:13
         env:
@@ -38,9 +48,14 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: 1
           PYTHONUNBUFFERED: 1
-          SQL_DB: testdb
           POSTGRES_HOST: 127.0.0.1
-          SQL_USER: user
+          RABBITMQ_HOST: 127.0.0.1
+          RABBITMQ_PASSWORD: admin
+          RABBITMQ_USER: admin
+          POSTGRES_USER: user
           POSTGRES_PASSWORD: secret
-          PGPASSWORD: secret
+          POSTGRES_DB: testdb
+          POSTGRES_TEST_DB: testdb
+          APPRAISAL_QUEUE: 'test_appraisal_requests'
+          APPRAISAL_ROUTING_KEY: 'test_appraisal_requests'
 

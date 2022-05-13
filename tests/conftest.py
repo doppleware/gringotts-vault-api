@@ -1,8 +1,7 @@
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import event
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncConnection
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
@@ -10,6 +9,7 @@ from gringotts.database import engine
 from gringotts.main import app
 from gringotts.models.base import Base
 from tests.seed.seed_data import seed
+
 
 @pytest.fixture(
     params=[

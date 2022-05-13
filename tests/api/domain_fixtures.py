@@ -1,3 +1,5 @@
+import datetime
+
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,6 +40,11 @@ async def vault_ledger(db_session, vault: Vault) -> VaultLedger:
 
 
 @pytest_asyncio.fixture
+async def unappraised_ledger(db_session, vault: Vault) -> VaultLedger:
+    new_vault = await _create_unappraised_ledger(db_session, vault.vault_number)
+    return new_vault
+
+@pytest_asyncio.fixture
 async def another_vault_ledger(db_session, another_vault: Vault) -> VaultLedger:
     new_vault = await _create_vault_ledger(db_session, another_vault.vault_number, 200,2000, 20000)
     return new_vault
@@ -73,6 +80,15 @@ async def _create_vault_owner(db_session, name: str, username: str, vault: Vault
     return merlin
 
 
+async def _create_unappraised_ledger(db_session, vault_number:int):
+    async with db_session as session:
+        session: AsyncSession
+        ledger = VaultLedger(vault_number=vault_number)
+        session.add(ledger)
+        await session.commit()
+    return ledger
+
+
 async def _create_vault_ledger(db_session, vault_number:int, galleons:int, sickles:int, knuts:int):
     async with db_session as session:
         session: AsyncSession
@@ -80,6 +96,7 @@ async def _create_vault_ledger(db_session, vault_number:int, galleons:int, sickl
         ledger.galleons=galleons
         ledger.knuts=knuts
         ledger.sickles=sickles
+        ledger.last_appraised=datetime.datetime.now()
         session.add(ledger)
         await session.commit()
     return ledger

@@ -37,6 +37,15 @@ class Settings(BaseSettings):
     jwt_algorithm: str = os.getenv("ALGORITHM", "")
     jwt_access_toke_expire_minutes: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1)
 
+    rabbit_user: str = os.getenv("RABBITMQ_USER", "")
+    rabbit_pass: str = os.getenv("RABBITMQ_PASSWORD", "")
+    rabbit_host: str = os.getenv("RABBITMQ_HOST", "")
+
+    appraisal_queue: str = os.getenv("APPRAISAL_QUEUE", "")
+    appraisal_routing_key: str = os.getenv("APPRAISAL_ROUTING_KEY", "")
+
+    otlp_exporter_url: str = os.getenv("OTLP_EXPORTER_URL", "")
+
     muggle_exchange_api: str = os.getenv("MUGGLE_EXCHANGE_API", "")
 
 

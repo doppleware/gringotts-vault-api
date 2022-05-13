@@ -6,9 +6,8 @@ import string
 from typing import List
 
 import sqlalchemy
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, query, Query
+from sqlalchemy.orm import sessionmaker
 
 from gringotts import config
 from gringotts.models.vault import Vault

@@ -1,45 +1,95 @@
-# fastapi-sqlalchemy-asyncpg
-[![developer](https://img.shields.io/badge/Dev-grillazz-green?style)](https://github.com/grillazz)
+# Gringotts Vault API
 ![language](https://img.shields.io/badge/language-python-blue?style)
-[![CI](https://img.shields.io/github/workflow/status/grillazz/fastapi-sqlalchemy-asyncpg/Unit%20Tests/main)](https://github.com/grillazz/fastapi-sqlalchemy-asyncpg/actions/workflows/build-and-test.yml?query=event%3Apush+branch%3Amain)
-[![license](https://img.shields.io/github/license/grillazz/fastapi-sqlalchemy-asyncpg)](https://github.com/grillazz/fastapi-sqlalchemy-asyncpg/blob/main/LICENSE)
-![visitors](https://visitor-badge.laobi.icu/badge?page_id=grillazz.fastapi-sqlalchemy-asyncpg")
+[![CI](https://img.shields.io/github/workflow/status/doppleware/gringotts-vault-api/Unit%20Tests/main)](https://github.com/doppleware/gringotts-vault-api/actions/workflows/build-and-test.yml?query=event%3Apush+branch%3Amain)
+[![license](https://img.shields.io/github/license/doppleware/gringotts-vault-api)](https://github.com/doppleware/gringotts-vault-api/blob/main/LICENSE)
 
-Example for [FastAPI](https://fastapi.tiangolo.com/) integration with [SQLAlchemy](https://www.sqlalchemy.org/) ORM with PostgreSQL via [asyncpg](https://github.com/MagicStack/asyncpg) a fast Database Client Library for python/asyncio.
+<p align="center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Gringotts%2C_Harry_Potter_Studio_Tour_%2848538071011%29.jpg/1597px-Gringotts%2C_Harry_Potter_Studio_Tour_%2848538071011%29.jpg?20210516121542" 
+width="600" height="400">
+</p>
 
-Beside of using latest and greatest version of [SQLAlchemy](https://www.sqlalchemy.org/) with it robustness, powerfulness and speed
-of [asyncpg](https://github.com/MagicStack/asyncpg) there is [FastAPI](https://fastapi.tiangolo.com/) (modern, fast (high-performance), 
-web framework for building APIs with Python 3.7+ based on standard Python type hints.) already reviewed
-on [thoughtworks](https://www.thoughtworks.com/radar/languages-and-frameworks?blipid=202104087).
+This is an example on integrating [FastAPI](https://fastapi.tiangolo.com/) and additional libraries with OpenTelemetry and
+common tracing tools. The goal is to create more realistic scenarios (if one could say that about a fantasy setting) 
+in terms of an application that goes beyond 'simple CRUD' and can demonstrate the value of using distributed tracing in the 
+development day to day.  It should be disclaimed and pointed out that this does not purport to be in any way a 'go-to'
+architecture - please don't use it as such! It is intended to examine different architectural problems and how we can 
+use observability to solve them.
+
+This example is based on a [great repo](https://github.com/grillazz/fastapi-sqlalchemy-asyncpg) by @grillazz from which 
+it was also original forked.
+
+The fully instrumented stack includes:
+- [SQLAlchemy](https://www.sqlalchemy.org/) ORM
+- PostgreSQL via [asyncpg](https://github.com/MagicStack/asyncpg) 
+- Async HTTP via [httpx](https://www.python-httpx.org/) we will use it to connect to a mock site created via [mockapi](https://mockapi.io/)
+- RabbitMQ queuing via [pika](https://github.com/pika/pika)
+
+From the tracing stack side we'll use:
+- [Jaeger](https://www.jaegertracing.io/) for distributed tracing 
+- [Prometheus](https://prometheus.io/) for metrics (TBD still WIP)
+- [Digma](https://github.com/digma-ai/digma) for getting observability insights back into the code.
 
 
+### Running via Docker Compose
 
-### How to Setup
-To build , run and test and more ... use magic of make help to play with this project.
-```shell
-make help
+#### 1. Start the observability stack:
+```commandline
+docker compose -f ./deploy/tracing/docker-compose.trace.yml
+docker compose -f ./deploy/tracing/docker-compose.digma.yml
 ```
-and you receive below list:
-```text
-build                Build project with compose
-down                 Reset project containers with compose
-format               Format project code.
-help                 Show this help
-lint                 Lint project code.
-lock                 Refresh pipfile.lock
-requirements         Refresh requirements.txt from pipfile.lock
-safety               Check project and dependencies with safety https://github.com/pyupio/safety
-test                 Run project tests
-up                   Run project with compose
+#### 2. Start the Gringotts API application, including all services and background 'Goblin worker' process
+
+```commandline
+docker compose -f ./deploy/tracing/docker-compose.trace.yml -d 
 ```
 
+#### 3. Seed with sample data
+This will import in some Wizards from a data source I 
+found [online](https://www.kaggle.com/datasets/gulsahdemiryurek/harry-potter-dataset),
+to make it a little easier to work with the API 
+```commandline
+python ./tests/seed/seed_data.py
+```
 
-### How to feed database
+### Developing and testing
 
-It took me a while to find nice data set. Hope works of Shakespeare as example will be able to cover 
-first part with read only declarative base configuration and all type of funny selects :)
-Data set is coming form https://github.com/catherinedevlin/opensourceshakespeare
-Next models were generated with https://github.com/agronholm/sqlacodegen
-And after some tweaking I got desired result
+#### Installing requirements locally
 
-Hope you enjoy it.
+Create a separate python env for the worker and gringotts folders.
+For each environment install the local requirements.txt file.
+
+For example, using virtualenv.
+```commandline
+cd gringotts
+python -m venv ./venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+```
+
+##### Issues with psycopg2 and M1 Macbooks. 
+I had an issue with this requirement on my local development laptop. 
+I had to manually install openssl and then install via pip after setting these environment variables:
+```
+LDFLAGS="-I/opt/homebrew/opt/openssl@3/include -L/opt/homebrew/opt/openssl@3/lib" pip install psycopg2-binary
+```
+The solution to this known issue is posted in several places including [here](https://stackoverflow.com/questions/66777470/psycopg2-installed-on-m1-running-macos-big-sur-but-unable-to-run-local-server)
+
+#### Development mode
+To simply run the backend services (Postgres, RabbitMQ) to develop locally from the IDE, run:
+```commandline
+docker compose --profile develop -f ./deploy/tracing/docker-compose.trace.yml -d 
+```
+
+### #Run automated tests 
+
+To run the tests via docker compose, use the 
+```commandline
+ docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --attach gt-vault-api
+ ```
+
+To run the tests with some seeded data to see how the system behaves with data in place, use:
+
+```commandline
+PYTEST_ARGUMENTS="--seed-data true" docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --attach gt-vault-api --abort-on-container-exit
+ ```
+

@@ -47,13 +47,13 @@ async def validate_vault_owner_and_key(db_session: AsyncSession, request: Authen
         if vault_id != request.vault_number:
             raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't belong to requestor")
 
-        key = search_for_key_record(db_session, key=request.vault_key)
+        key = await search_for_key_record(db_session, key=request.vault_key)
         if not key:
             raise CreatureNotAuthenticatedException(f"Specified key record {request.vault_key} not found!")
 
         # Vault requested is the one that belongs to the requestor
         vault: Vault = await Vault.find(db_session, request.vault_number)
-        if vault.vault_key_id != request.vault_key:
+        if vault.vault_key_id != key:
             raise CreatureNotAuthenticatedException(f"Specified key {request.vault_key} doesn't match vault")
 
 
@@ -62,9 +62,9 @@ async def search_for_key_record(db_session: AsyncSession, key: str):
     with tracer.start_as_current_span("Retrieiving the key record"):
         keys = await VaultKey.all(db_session)
         found_key = None
-        for key in keys:
-            key: VaultKey
-            if key.key == key:
+        for key_record in keys:
+            key_record: VaultKey
+            if key_record.key == key:
                 found_key = key
 
         return found_key
