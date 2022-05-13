@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+import os
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from sqlalchemy.orm import sessionmaker

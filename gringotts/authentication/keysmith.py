@@ -7,7 +7,7 @@ from starlette import status
 
 from gringotts.config import get_settings
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/gringotts/vaults/token")
 settings = get_settings()
 
 

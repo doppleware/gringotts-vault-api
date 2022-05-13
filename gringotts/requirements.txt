@@ -40,6 +40,8 @@ uvicorn==0.17.6
 uvloop==0.16.0
 pika
 python-jose
+python-multipart
+psycopg2-binary
 
 opentelemetry-sdk==1.11.1
 opentelemetry-instrumentation-fastapi==0.30b1

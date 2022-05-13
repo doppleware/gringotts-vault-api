@@ -1,6 +1,6 @@
 import json
 import logging
-
+import os
 import pika
 import pytest
 from httpx import AsyncClient
@@ -29,6 +29,7 @@ class GoblinWorker:
     def go_appraise_vault(self, ch, method, properties, body):
         self.appraise_request_received = True
         self.vault_id_received = body.decode('utf-8')
+
 
 @pytest.mark.asyncio
 async def test_cannot_get_appraisal_if_not_logged_in(anyio_backend,

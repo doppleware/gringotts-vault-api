@@ -33,31 +33,67 @@ async def create_vault_owner_api_key(vault_owner: VaultOwner):
     return create_access_token({"vault_owner": vault_owner.username})
 
 
-async def validate_vault_owner_and_key(db_session: AsyncSession, request: AuthenticationRequest):
+async def authorize_vault_owner_vault_access(db_session: AsyncSession, vault_owner_id :str, vault_id: int):
+
+    owner = await VaultOwner.find(db_session, vault_owner_id)
+    await _ensure_owns_requested_vault(owner, vault_id)
+
+
+async def authenticate_vault_owner_and_key(db_session: AsyncSession, vault_owner: str, vault_key: str ):
     with tracer.start_as_current_span("Validating authentication request details match"):
         # Owner is known
-        owner: VaultOwner = await VaultOwner.find(username=request.vault_owner, db_session=db_session)
-        if not owner:
-            raise CreatureNotAuthenticatedException(f"Creature {request.vault_owner} isn't a registered owner")
+        owner = await _ensure_owner_exists(db_session, vault_owner)
 
-        # Vault requested is the one that belongs to the requestor
-        vault_id = owner.vault_id
-        if not vault_id:
-            raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't exist")
-        if vault_id != request.vault_number:
-            raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't belong to requestor")
+        await _ensure_owner_has_a_vault(owner)
 
-        key = await search_for_key_record(db_session, key=request.vault_key)
-        if not key:
-            raise CreatureNotAuthenticatedException(f"Specified key record {request.vault_key} not found!")
+        key = await _ensure_key_matches_records(db_session, vault_key)
 
-        # Vault requested is the one that belongs to the requestor
-        vault: Vault = await Vault.find(db_session, request.vault_number)
-        if vault.vault_key_id != key:
-            raise CreatureNotAuthenticatedException(f"Specified key {request.vault_key} doesn't match vault")
+        await _ensure_key_matches_owner_vault(db_session, key, owner, vault_key)
+
+        return owner
 
 
-async def search_for_key_record(db_session: AsyncSession, key: str):
+async def authorize_owner_access_to_vault(owner_access, vault_number):
+
+    if owner_access.vault_number != vault_number:
+        raise CreatureNotAuthenticatedException(f"Requested can't access specified vault_id")
+
+
+async def _ensure_owns_requested_vault(owner, vault_id):
+    if owner.vault_id != vault_id:
+        raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't belong to requestor")
+
+
+async def _ensure_key_matches_owner_vault(db_session, key, owner, vault_ley):
+    # Vault requested is the one that belongs to the requestor
+    vault: Vault = await Vault.find(db_session, owner.vault_id)
+    if vault.vault_key_id != key:
+        raise CreatureNotAuthenticatedException(f"Specified key {vault_ley} doesn't match vault")
+
+
+async def _ensure_key_matches_records(db_session, vault_key: str):
+    key = await _search_for_key_record(db_session, key=vault_key)
+    if not key:
+        raise CreatureNotAuthenticatedException(f"Specified key record {vault_key} not found!")
+    return key
+
+
+async def _ensure_owner_has_a_vault(owner):
+    # Vault requested is the one that belongs to the requestor
+    vault_id = owner.vault_id
+    if not vault_id:
+        raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't exist")
+    return vault_id
+
+
+async def _ensure_owner_exists(db_session, vault_owner:str):
+    owner: VaultOwner = await VaultOwner.find(username=vault_owner, db_session=db_session)
+    if not owner:
+        raise CreatureNotAuthenticatedException(f"Creature {vault_owner} isn't a registered owner")
+    return owner
+
+
+async def _search_for_key_record(db_session: AsyncSession, key: str):
     # Purposely inefficient... job security?
     with tracer.start_as_current_span("Retrieiving the key record"):
         keys = await VaultKey.all(db_session)
