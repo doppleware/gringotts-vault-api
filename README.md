@@ -54,13 +54,21 @@ This will import in some Wizards from a data source I
 found [online](https://www.kaggle.com/datasets/gulsahdemiryurek/harry-potter-dataset),
 to make it a little easier to work with the API 
 ```commandline
-python ./tests/seed/seed_data.py
+PYTHONPATH=. python ./tests/seed/seed_data.py
 ```
 
 #### 4. Create some data
+Go to the API documentation page at http://localhost:8283/docs and login at /authenticate.
+Since we populated some data you can use the following details:
+vault_owner: hpotter
+key: griffindoor
+
+Notice that it takes some time to process, we'll look into that in a sec.
 
 #### 5. Install the IDE Extension
 
+Install the [Digma extension](https://marketplace.visualstudio.com/items?itemName=digma.digma) on your local IDE.
+We'll use Digma to demonstrate continuous feedback.
 
 
 ### Installing requirements locally
