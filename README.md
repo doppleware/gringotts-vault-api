@@ -41,13 +41,12 @@ From the tracing stack side we'll use:
 
 #### 1. Start the observability stack:
 ```commandline
-docker compose -f ./deploy/tracing/docker-compose.trace.yml
-docker compose -f ./deploy/tracing/docker-compose.digma.yml
+docker compose -f ./deploy/tracing/docker-compose.trace.yml -f ./deploy/tracing/docker-compose.digma.yml up -d
 ```
 #### 2. Start the Gringotts API application, including all services and background 'Goblin worker' process
 
 ```commandline
-docker compose -f ./deploy/tracing/docker-compose.trace.yml -d 
+docker compose --profile standalone up -d 
 ```
 
 #### 3. Seed with sample data
@@ -58,7 +57,7 @@ to make it a little easier to work with the API
 PYTHONPATH=. python ./tests/seed/seed_data.py
 ```
 
-#### 4. Create some data
+#### 4. Generate some activity to observe
 Go to the API documentation page at http://localhost:8283/docs and login using the authenticate button.
 
 <img width="1473" alt="image" src="https://user-images.githubusercontent.com/93863/168254302-c9f9a7bd-2c33-45fc-b5e8-2efa8e62e362.png">
