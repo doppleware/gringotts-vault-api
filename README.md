@@ -41,12 +41,12 @@ From the tracing stack side we'll use:
 
 #### 1. Start the observability stack:
 ```commandline
-docker compose -f ./deploy/tracing/docker-compose.trace.yml -f ./deploy/tracing/docker-compose.digma.yml -d
+docker compose -f ./deploy/tracing/docker-compose.trace.yml -f ./deploy/tracing/docker-compose.digma.yml up -d
 ```
 #### 2. Start the Gringotts API application, including all services and background 'Goblin worker' process
 
 ```commandline
-docker compose -f ./deploy/tracing/docker-compose.trace.yml -d 
+docker compose --profile standalone up -d 
 ```
 
 #### 3. Seed with sample data
