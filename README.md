@@ -29,8 +29,14 @@ From the tracing stack side we'll use:
 - [Prometheus](https://prometheus.io/) for metrics (TBD still WIP)
 - [Digma](https://github.com/digma-ai/digma) for getting observability insights back into the code.
 
+### Prerequisites
 
-### Running via Docker Compose
+1. [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/install/) (not a hard requirement, but makes woking with this example easier)
+2. Python 3.8+ 
+3. [vsCode](https://code.visualstudio.com/) - For some aspects of developer observability
+
+
+### Up and running in five steps
 
 #### 1. Start the observability stack:
 ```commandline
@@ -51,9 +57,13 @@ to make it a little easier to work with the API
 python ./tests/seed/seed_data.py
 ```
 
-### Developing and testing
+#### 4. Create some data
 
-#### Installing requirements locally
+#### 5. Install the IDE Extension
+
+
+
+### Installing requirements locally
 
 Create a separate python env for the worker and gringotts folders.
 For each environment install the local requirements.txt file.
@@ -66,7 +76,7 @@ source ./venv/bin/activate
 pip install -r requirements.txt
 ```
 
-##### Issues with psycopg2 and M1 Macbooks. 
+#### Issues with psycopg2 and M1 Macbooks. 
 I had an issue with this requirement on my local development laptop. 
 I had to manually install openssl and then install via pip after setting these environment variables:
 ```
@@ -74,13 +84,13 @@ LDFLAGS="-I/opt/homebrew/opt/openssl@3/include -L/opt/homebrew/opt/openssl@3/lib
 ```
 The solution to this known issue is posted in several places including [here](https://stackoverflow.com/questions/66777470/psycopg2-installed-on-m1-running-macos-big-sur-but-unable-to-run-local-server)
 
-#### Development mode
+### Development mode
 To simply run the backend services (Postgres, RabbitMQ) to develop locally from the IDE, run:
 ```commandline
 docker compose --profile develop -f ./deploy/tracing/docker-compose.trace.yml -d 
 ```
 
-### #Run automated tests 
+### Run automated tests 
 
 To run the tests via docker compose, use the 
 ```commandline
@@ -92,4 +102,7 @@ To run the tests with some seeded data to see how the system behaves with data i
 ```commandline
 PYTEST_ARGUMENTS="--seed-data true" docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --attach gt-vault-api --abort-on-container-exit
  ```
+ 
+ <img width="1028" alt="image" src="https://user-images.githubusercontent.com/93863/168214621-df229754-c0e5-460f-8dc9-ce4c4694df97.png">
+
 
