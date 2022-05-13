@@ -3,7 +3,7 @@ import csv
 import os
 import random
 import string
-from typing import List
+from typing import Dict, List
 
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -13,6 +13,8 @@ from gringotts import config
 from gringotts.models.vault import Vault
 from gringotts.models.vault_key import VaultKey
 from gringotts.models.vault_owner import VaultOwner
+from gringotts.models.vault_ledger import VaultLedger
+
 
 
 def clean_string(value: str):
@@ -37,20 +39,23 @@ async def save_all(async_session: sessionmaker,
 
 def generate_keys(number: int) -> List[VaultKey]:
     # printing letters
+
     keys = []
     for i in range(number):
         keys.append(VaultKey(generate_key()))
+
     return keys
 
 
-def generate_vaults(number: int, keys: List[VaultKey], max_vault_number) -> List[Vault]:
+def generate_vaults(number: int, keys: List[VaultKey], max_vault_number) -> Dict[int,Vault]:
     # printing letters
-    vaults = []
+    vaults = {}
     if len(keys) < number:
         raise Exception("must have more keys than vaults")
 
     for i in range(number):
-        vaults.append(Vault(vault_number=i + max_vault_number, vault_key_id=keys[i].key))
+        vault_number = i + max_vault_number
+        vaults[vault_number]=Vault(vault_number=vault_number, vault_key_id=keys[i].key)
     return vaults
 
 
@@ -69,17 +74,25 @@ async def get_max_vault_number(async_session: sessionmaker):
             return 0
         return number
 
+def add_special_vaults(vaults: Dict[str, Vault]):
+    potter_vault = Vault(vault_number=713, vault_key_id="griffindoor")
+    vaults[713]=potter_vault
+
 
 async def seed(sm: sessionmaker = None):
     if not sm:
         sm = await create_session_maker()
 
     keys = generate_keys(10000)
+    potter_key = VaultKey('griffindoor')
+    keys.append(potter_key)
     await save_all(sm, keys)
 
     current_max_vault = await get_max_vault_number(sm)
-    vaults = generate_vaults(1000, keys, current_max_vault + 1)
-    await save_all(sm, vaults)
+    vaults = generate_vaults(1000, keys, current_max_vault + 1) 
+    add_special_vaults(vaults)
+    await save_all(sm, vaults.values())
+
 
     owners = import_wizards(vaults=vaults)
     await save_all(sm, owners)
@@ -124,11 +137,19 @@ def import_wizards(vaults: List[Vault]):
                 if not name:
                     continue
                 species = convert_to_enum(row[species_index])
-                username = ''.join(ch for ch in name if ch.isalnum()).strip().lower()
-                owners.append(VaultOwner(name=name,
-                                         species=species,
-                                         username=username,
-                                         vault_id=vaults[i].vault_number))
+                if name == 'Harry James Potter':
+                    username='hpotter'
+                    owners.append(VaultOwner(name=name,
+                        species=species,
+                        username='hpotter',
+                        vault_id=713))
+
+                else:
+                    username = ''.join(ch for ch in name if ch.isalnum()).strip().lower()
+                    owners.append(VaultOwner(name=name,
+                                            species=species,
+                                            username=username,
+                                            vault_id=vaults[i].vault_number))
                 i += 1
     return owners
 
