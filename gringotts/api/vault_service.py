@@ -73,7 +73,7 @@ async def get_vault_appraisal(vault_id: str, muggle_currency_code: Optional[str]
 
 
 @router.post("/appraise", response_model=VaultBalanceResponse, status_code=status.HTTP_201_CREATED)
-async def get_vault_appraisal(payload: VaultAppraisalRequest,
+async def start_new_vault_appraisal(payload: VaultAppraisalRequest,
                               db_session: AsyncSession = Depends(get_db),
                               owner_access: VaultOwnerAccess = Depends(get_owner_access)):
 
