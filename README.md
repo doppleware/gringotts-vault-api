@@ -34,6 +34,7 @@ From the tracing stack side we'll use:
 1. [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/install/) (not a hard requirement, but makes woking with this example easier)
 2. Python 3.8+ 
 3. [vsCode](https://code.visualstudio.com/) - For some aspects of developer observability
+4. Clone or download the repo 
 
 
 ### Up and running in five steps
@@ -72,6 +73,14 @@ Notice that it takes some time to process, we'll look into that in a sec.
 
 Install the [Digma extension](https://marketplace.visualstudio.com/items?itemName=digma.digma) on your local IDE.
 We'll use Digma to demonstrate continuous feedback.
+
+### Seeing the tracing data
+
+1. Open http://localhost:16686 to access the Jaege instance. By now you should already have some data to look at.
+<img width="1726" alt="image" src="https://user-images.githubusercontent.com/93863/168373811-8261c479-e052-4704-aaaa-671e93b49e01.png">
+
+2. Upon installing the [Digma extension](https://marketplace.visualstudio.com/items?itemName=digma.digma) open your vscode and select the Digma icon to see information in the context of the code.
+
 
 
 ### Installing requirements locally
