@@ -64,8 +64,7 @@ Go to the API documentation page at http://localhost:8283/docs and login using t
 
 
 Since we populated some data you can use the following details:
-username: hpotter
-password: griffindoor
+`username`: hpotter `password`: griffindoor
 
 Notice that it takes some time to process, we'll look into that in a sec.
 
