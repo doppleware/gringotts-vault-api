@@ -1,6 +1,6 @@
 # Gringotts Vault API
 ![language](https://img.shields.io/badge/language-python-blue?style)
-[![CI](https://img.shields.io/github/workflow/status/doppleware/gringotts-vault-api/Integration%20Tests/main)](https://github.com/doppleware/gringotts-vault-api/actions/workflows/build-and-test.yml?query=event%3Apush+branch%3Amain)
+[![Integration Tests](https://github.com/doppleware/gringotts-vault-api/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/doppleware/gringotts-vault-api/actions/workflows/build-and-test.yml)
 [![license](https://img.shields.io/github/license/doppleware/gringotts-vault-api)](https://github.com/doppleware/gringotts-vault-api/blob/main/LICENSE)
 
 <p align="center">
