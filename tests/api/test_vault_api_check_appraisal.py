@@ -1,22 +1,14 @@
 import json
+import logging
 
 import pika
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from pika import PlainCredentials
 from pika.adapters.blocking_connection import BlockingChannel
-from pika.channel import Channel
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_410_GONE, HTTP_201_CREATED
-import json
 
-from waiting import wait
-
-from config import get_settings
-from gringotts.models.vault import Vault
-from gringotts.models.vault_key import VaultKey
-from gringotts.models.vault_owner import VaultOwner
+from gringotts.config import get_settings
 
 pytestmark = pytest.mark.anyio
 from tests.api.domain_fixtures import  *
@@ -26,11 +18,11 @@ class GoblinWorker:
     def __init__(self, channel: BlockingChannel) -> None:
         self.appraise_request_received = False
         self.vault_id_received = None
-        channel.queue_declare('appraisal_requests')
+        channel.queue_declare(get_settings().appraisal_queue)
         self.channel=channel
 
     def cosnume(self):
-        self.channel.basic_consume(queue='appraisal_requests', on_message_callback=self.go_appraise_vault, auto_ack=True)
+        self.channel.basic_consume(queue=get_settings().appraisal_queue, on_message_callback=self.go_appraise_vault, auto_ack=True)
         self.channel._process_data_events(4)
 
     def go_appraise_vault(self, ch, method, properties, body):
@@ -152,7 +144,13 @@ async def goblin_worker_consumer(consumer_channel: BlockingChannel) -> GoblinWor
 
 @pytest_asyncio.fixture
 async def consumer_channel() -> BlockingChannel:
-    cr = PlainCredentials(get_settings().rabbit_user, get_settings().rabbit_pass)
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=get_settings().rabbit_host, credentials=cr))
-    return connection.channel()
+    while True:
+        try:
+            cr = PlainCredentials(get_settings().rabbit_user, get_settings().rabbit_pass)
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host=get_settings().rabbit_host, credentials=cr))
+            return connection.channel()
+        except Exception as e:
+            logging.error(str(e))
+
+
 

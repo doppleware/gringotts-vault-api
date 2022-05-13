@@ -40,4 +40,5 @@ class VaultKey(Base):
         :param db_session:
         :return:
         """
-        return await db_session.execute(select(cls))
+        result = await db_session.execute(select(cls))
+        return result.scalars()

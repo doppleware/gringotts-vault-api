@@ -2,7 +2,7 @@ import datetime
 import json
 from enum import Enum
 from typing import Dict
-from queueing import get_channel
+from gringotts.queueing import get_channel
 
 from httpx import AsyncClient
 from opentelemetry import trace
@@ -11,7 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from gringotts.config import get_settings
 from gringotts.models.vault_ledger import VaultLedger
 from gringotts.schemas.vault_balance import VaultBalanceResponse
-from waiting import wait
 
 tracer = trace.get_tracer(__name__)
 
@@ -83,6 +82,7 @@ async def get_muggle_money_value(ledger: VaultLedger, muggle_currency_code: str)
 
 
 async def request_vault_appraisal(vault_number: int):
-    get_channel('appraisal_requests')\
-        .basic_publish(exchange='', routing_key='appraisal_requests', body=str(vault_number))
+    settings = get_settings()
+    get_channel(settings.appraisal_queue)\
+        .basic_publish(exchange='', routing_key=settings.appraisal_routing_key, body=str(vault_number))
 

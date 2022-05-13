@@ -88,6 +88,7 @@ async def _create_unappraised_ledger(db_session, vault_number:int):
         await session.commit()
     return ledger
 
+
 async def _create_vault_ledger(db_session, vault_number:int, galleons:int, sickles:int, knuts:int):
     async with db_session as session:
         session: AsyncSession

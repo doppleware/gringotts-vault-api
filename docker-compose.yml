@@ -1,7 +1,10 @@
 version: '3'
 
 services:
-  rabbitmq:
+
+  gt-rabbitmq:
+    profiles: [ "develop","standalone","test" ]
+    container_name: gt-rabbitmq
     image: rabbitmq:3-management-alpine
     ports:
       - "15672:15672"
@@ -12,10 +15,17 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-    profiles: ["develop","standalone"]
+    env_file:
+      - .env
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
-  db:
-    container_name: db
+  gt-vault-db:
+    profiles: [ "develop","standalone","test" ]
+    container_name: gt-vault-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -28,8 +38,6 @@ services:
       - postgres_gt_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-    profiles: ["develop","standalone"]
-
     healthcheck:
       test:
         [
@@ -39,37 +47,36 @@ services:
       timeout: 5s
       retries: 5
 
-  worker:
-    build: ./worker
-    profiles: ["standalone"]
-
+  gt-goblin-worker:
+    profiles: [ "standalone" ]
+    container_name: gt-goblin-worker
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
     depends_on:
-      - db
+      - gt-vault-db
+      - gt-rabbitmq
     environment:
-      - POSTGRES_HOST=db
-      - RABBITMQ=db
-
+      - POSTGRES_HOST=gt-vault-db
+      - RABBITMQ_HOST=gt-rabbitmq
+      - OTLP_EXPORTER_URL=host.docker.internal:4317
     env_file:
       - .env
     command: bash -c "
-      uvicorn gringotts.main:app
-      --host 0.0.0.0 --port 8080
-      --lifespan=on --use-colors --loop uvloop --http httptools
-      --reload --log-level debug
+      python ./main.py
       "
-    volumes:
-      - .:/app
-    ports:
-      - 8283:8080
-      -
-  app:
+
+  gt-vault-api:
     build: .
-    profiles: ["standalone"]
-
+    profiles: ["standalone", "test"]
+    container_name: gt-vault-api
     depends_on:
-      - db
+      - gt-vault-db
+      - gt-rabbitmq
     environment:
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=gt-vault-db
+      - OTLP_EXPORTER_URL=host.docker.internal:4317
+      - RABBITMQ_HOST=gt-rabbitmq
     env_file:
       - .env
     command: bash -c "
@@ -82,6 +89,8 @@ services:
       - .:/app
     ports:
       - 8283:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
  
 networks:
   default:

@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     rabbit_pass: str = os.getenv("RABBITMQ_PASSWORD", "")
     rabbit_host: str = os.getenv("RABBITMQ_HOST", "")
 
+    appraisal_queue: str = os.getenv("APPRAISAL_QUEUE", "")
+    appraisal_routing_key: str = os.getenv("APPRAISAL_ROUTING_KEY", "")
+
     otlp_exporter_url: str = os.getenv("OTLP_EXPORTER_URL", "")
 
     muggle_exchange_api: str = os.getenv("MUGGLE_EXCHANGE_API", "")

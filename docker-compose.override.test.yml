@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  gt-rabbitmq:
+    container_name: gt-rabbitmq-test
+    environment:
+      - APPRAISAL_QUEUE='test_appraisal_requests'
+      - APPRAISAL_ROUTING_KEY='test_appraisal_requests'
+
+  gt-vault-api:
+    container_name: gt-vault-api-test
+    environment:
+      - SQL_DB=testdb
+    command: bash -c "
+        pytest ${PYTEST_ARGUMENTS}
+      "
+
+  gt-vault-db:
+    container_name: gt-vault-db-test
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - SQL_DB=testdb
