@@ -3,14 +3,13 @@ version: '3'
 services:
   gt-rabbitmq:
     container_name: gt-rabbitmq-test
-    environment:
-      - APPRAISAL_QUEUE='test_appraisal_requests'
-      - APPRAISAL_ROUTING_KEY='test_appraisal_requests'
 
   gt-vault-api:
     container_name: gt-vault-api-test
     environment:
       - SQL_DB=testdb
+      - APPRAISAL_QUEUE='test_appraisal_requests'
+      - APPRAISAL_ROUTING_KEY='test_appraisal_requests'
     command: bash -c "
         pytest ${PYTEST_ARGUMENTS}
       "

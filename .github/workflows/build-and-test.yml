@@ -55,7 +55,7 @@ jobs:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: testdb
-          PGPASSWORD: secret
           POSTGRES_TEST_DB: testdb
-
+          APPRAISAL_QUEUE: 'test_appraisal_requests'
+          APPRAISAL_ROUTING_KEY: 'test_appraisal_requests'
 
