@@ -58,10 +58,14 @@ PYTHONPATH=. python ./tests/seed/seed_data.py
 ```
 
 #### 4. Create some data
-Go to the API documentation page at http://localhost:8283/docs and login at /authenticate.
+Go to the API documentation page at http://localhost:8283/docs and login using the authenticate button.
+
+<img width="1473" alt="image" src="https://user-images.githubusercontent.com/93863/168254302-c9f9a7bd-2c33-45fc-b5e8-2efa8e62e362.png">
+
+
 Since we populated some data you can use the following details:
-vault_owner: hpotter
-key: griffindoor
+username: hpotter
+password: griffindoor
 
 Notice that it takes some time to process, we'll look into that in a sec.
 
