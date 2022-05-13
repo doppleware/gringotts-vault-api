@@ -21,8 +21,9 @@ class GoblinWorker:
         channel.queue_declare(get_settings().appraisal_queue)
         self.channel=channel
 
-    def cosnume(self):
-        self.channel.basic_consume(queue=get_settings().appraisal_queue, on_message_callback=self.go_appraise_vault, auto_ack=True)
+    def consume(self):
+        self.channel.basic_consume(queue=get_settings().appraisal_queue, on_message_callback=self.go_appraise_vault,
+                                   auto_ack=True)
         self.channel._process_data_events(4)
 
     def go_appraise_vault(self, ch, method, properties, body):
@@ -122,7 +123,7 @@ async def test_request_vault_appraisal(anyio_backend,
 
     assert response.status_code == HTTP_201_CREATED
 
-    goblin_worker_consumer.cosnume()
+    goblin_worker_consumer.consume()
 
     assert goblin_worker_consumer.appraise_request_received
 

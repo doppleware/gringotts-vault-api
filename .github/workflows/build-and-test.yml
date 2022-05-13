@@ -1,5 +1,5 @@
 
-name: Unit Tests
+name: Integration Tests
 
 on: [pull_request]
 
@@ -13,12 +13,15 @@ jobs:
 
     services:
       rabbitmq:
-        image: rabbitmq
+        image: rabbitmq:latest
         env:
           RABBITMQ_DEFAULT_USER: admin
           RABBITMQ_DEFAULT_PASS: admin
         ports:
+          - 15672:15672
           - 5672:5672
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+
       sqldb:
         image: postgres:13
         env:
