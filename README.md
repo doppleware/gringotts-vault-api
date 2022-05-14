@@ -46,7 +46,7 @@ docker compose -f ./deploy/tracing/docker-compose.trace.yml -f ./deploy/tracing/
 #### 2. Start the Gringotts API application, including all services and background 'Goblin worker' process
 
 ```commandline
-docker compose --profile standalone up -d 
+docker compose --profile standalone -f docker-compose.yml -f docker-compose.override.standalone.yml up -d
 ```
 
 #### 3. Seed with sample data
@@ -106,20 +106,20 @@ The solution to this known issue is posted in several places including [here](ht
 ### Development mode
 To simply run the backend services (Postgres, RabbitMQ) to develop locally from the IDE, run:
 ```commandline
-docker compose --profile develop -f ./deploy/tracing/docker-compose.trace.yml -d 
+docker compose --profile develop -f docker-compose.yml -f docker-compose.override.develop.yml up -d
 ```
 
 ### Run automated tests 
 
 To run the tests via docker compose, use the 
 ```commandline
- docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --attach gt-vault-api
+ docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --abort-on-container-exit --attach gt-vault-api
  ```
 
 To run the tests with some seeded data to see how the system behaves with data in place, use:
 
 ```commandline
-PYTEST_ARGUMENTS="--seed-data true" docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --attach gt-vault-api --abort-on-container-exit
+PYTEST_ARGUMENTS="--seed-data true" docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --abort-on-container-exit --attach gt-vault-api --abort-on-container-exit
  ```
  
  <img width="1028" alt="image" src="https://user-images.githubusercontent.com/93863/168214621-df229754-c0e5-460f-8dc9-ce4c4694df97.png">
