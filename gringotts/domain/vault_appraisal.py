@@ -31,7 +31,7 @@ class MuggleCurrencies(Enum):
 
 
 async def get_muggle_exchange_rates(currency_code: str):
-    with tracer.start_as_current_span("Retrieving muggle exchange rate from API"):
+    with tracer.start_as_current_span("Retrieving muggle exchange rate"):
         async with AsyncClient(
                 headers={"Content-Type": "application/json"},
         ) as client:
@@ -50,7 +50,7 @@ def ledger_expired(ledger: VaultLedger) -> bool:
 
 
 async def get_latest_vault_appraisal(db_session: AsyncSession, vault_number: int, muggle_currency_code: str):
-    with tracer.start_as_current_span("Getting latest appraisal for vault"):
+    with tracer.start_as_current_span("Getting latest vault appraisal"):
 
         ledger: VaultLedger = await VaultLedger.find_by_vault_id(db_session, vault_number)
 
@@ -82,7 +82,8 @@ async def get_muggle_money_value(ledger: VaultLedger, muggle_currency_code: str)
 
 
 async def request_vault_appraisal(vault_number: int):
-    settings = get_settings()
-    get_channel(settings.appraisal_queue)\
-        .basic_publish(exchange='', routing_key=settings.appraisal_routing_key, body=str(vault_number))
+    with tracer.start_as_current_span("Requesting vault appraise"):
+        settings = get_settings()
+        get_channel(settings.appraisal_queue)\
+            .basic_publish(exchange='', routing_key=settings.appraisal_routing_key, body=str(vault_number))
 

@@ -1,0 +1,15 @@
+# The standalone mode is for running the entire stack 
+# only the API is exposed, the rest is considered internal
+version: '3'
+
+services:
+  gt-rabbitmq:
+    container_name: gt-rabbitmq-internal
+
+  gt-vault-db:
+    container_name: gt-vault-db-internal
+  
+  gt-vault-api:
+    ports:
+      - 8283:8080
+
