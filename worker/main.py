@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 from queueing import create_queue_channel
 load_dotenv(verbose=True)
@@ -17,6 +18,7 @@ from goblin_worker import goblins_wait_for_work
 LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 logging.basicConfig(level=LOGLEVEL)
 
+
 def main():
 
     settings = get_settings()
@@ -27,6 +29,7 @@ def main():
     provider.add_span_processor(BatchSpanProcessor(exporter))
     trace.set_tracer_provider(provider)
     Psycopg2Instrumentor().instrument()
+    LoggingInstrumentor().instrument(set_logging_format=True)
     channel = create_queue_channel(settings)
     goblins_wait_for_work(channel)
 

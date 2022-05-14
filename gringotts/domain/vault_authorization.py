@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import Depends
 from opentelemetry import trace
 from pydantic import BaseModel
@@ -9,7 +11,7 @@ from gringotts.models.vault import Vault
 from gringotts.models.vault_owner import VaultOwner
 from gringotts.models.vault_key import VaultKey
 from gringotts.schemas.authentication import AuthenticationRequest
-
+logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
 
@@ -35,12 +37,13 @@ async def create_vault_owner_api_key(vault_owner: VaultOwner):
 
 async def authorize_vault_owner_vault_access(db_session: AsyncSession, vault_owner_id :str, vault_id: int):
 
-    owner = await VaultOwner.find(db_session, vault_owner_id)
-    await _ensure_owns_requested_vault(owner, vault_id)
+    with tracer.start_as_current_span("Authorize vault owner for access"):
+        owner = await VaultOwner.find(db_session, vault_owner_id)
+        await _ensure_owns_requested_vault(owner, vault_id)
 
 
 async def authenticate_vault_owner_and_key(db_session: AsyncSession, vault_owner: str, vault_key: str ):
-    with tracer.start_as_current_span("Validating authentication request details match"):
+    with tracer.start_as_current_span("Authenticate vault owner and key"):
         # Owner is known
         owner = await _ensure_owner_exists(db_session, vault_owner)
 
@@ -51,12 +54,6 @@ async def authenticate_vault_owner_and_key(db_session: AsyncSession, vault_owner
         await _ensure_key_matches_owner_vault(db_session, key, owner, vault_key)
 
         return owner
-
-
-async def authorize_owner_access_to_vault(owner_access, vault_number):
-
-    if owner_access.vault_number != vault_number:
-        raise CreatureNotAuthenticatedException(f"Requested can't access specified vault_id")
 
 
 async def _ensure_owns_requested_vault(owner, vault_id):

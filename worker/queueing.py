@@ -11,15 +11,9 @@ def create_queue_channel(settings: Settings) -> BlockingChannel:
     pika_instrumentation = PikaInstrumentor()
     cr = PlainCredentials(settings.rabbit_user, settings.rabbit_pass)
     logging.debug(f'Connecting to RabbitMQ: {settings.rabbit_user}/{settings.rabbit_pass}:{settings.rabbit_host}')
-    
-    while True:
-        try:
-            connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.rabbit_host, credentials=cr))
-            channel = connection.channel()
-            pika_instrumentation.instrument_channel(channel=channel)
-            channel.queue_declare(queue='appraisal_requests')
-            return channel
-        except Exception as e:
-            logging.info(f'Cant connect to rabbit: {settings.rabbit_user}/{settings.rabbit_pass}:{settings.rabbit_host}')
-            time.sleep(1)
-            pass
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.rabbit_host, credentials=cr))
+    channel = connection.channel()
+    pika_instrumentation.instrument_channel(channel=channel)
+    channel.queue_declare(queue='appraisal_requests')
+    return channel

@@ -1,0 +1,17 @@
+# The Dev override is just for easily starting the backend
+# services like database and queueing, their ports are exposed 
+# on the host machine so you can connect via the IDE
+version: '3'
+services:
+  gt-rabbitmq:
+    container_name: gt-rabbitmq-dev
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  gt-vault-db:
+    container_name: gt-vault-db-dev
+    ports:
+      - 5432:5432
+
+

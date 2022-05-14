@@ -146,13 +146,10 @@ async def goblin_worker_consumer(consumer_channel: BlockingChannel) -> GoblinWor
 
 @pytest_asyncio.fixture
 async def consumer_channel() -> BlockingChannel:
-    while True:
-        try:
-            cr = PlainCredentials(get_settings().rabbit_user, get_settings().rabbit_pass)
-            connection = pika.BlockingConnection(pika.ConnectionParameters(host=get_settings().rabbit_host, credentials=cr))
-            return connection.channel()
-        except Exception as e:
-            logging.error(str(e))
+    cr = PlainCredentials(get_settings().rabbit_user, get_settings().rabbit_pass)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=get_settings().rabbit_host, credentials=cr))
+    return connection.channel()
+
 
 
 

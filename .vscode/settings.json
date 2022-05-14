@@ -1,5 +1,5 @@
 {
-    "digma.environment": "LOCAL_TEST_RUN",
+    "digma.environment": "UNSET",
     "python.testing.pytestArgs": [
         "tests"
     ],

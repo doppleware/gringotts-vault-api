@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from enum import Enum
 from typing import Dict
 from gringotts.queueing import get_channel
@@ -11,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from gringotts.config import get_settings
 from gringotts.models.vault_ledger import VaultLedger
 from gringotts.schemas.vault_balance import VaultBalanceResponse
-
+logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
 LEDGER_EXPIRATION_IN_DAYS = 10
@@ -31,7 +32,7 @@ class MuggleCurrencies(Enum):
 
 
 async def get_muggle_exchange_rates(currency_code: str):
-    with tracer.start_as_current_span("Retrieving muggle exchange rate from API"):
+    with tracer.start_as_current_span("Retrieving muggle exchange rate"):
         async with AsyncClient(
                 headers={"Content-Type": "application/json"},
         ) as client:
@@ -50,11 +51,12 @@ def ledger_expired(ledger: VaultLedger) -> bool:
 
 
 async def get_latest_vault_appraisal(db_session: AsyncSession, vault_number: int, muggle_currency_code: str):
-    with tracer.start_as_current_span("Getting latest appraisal for vault"):
+    with tracer.start_as_current_span("Getting latest vault appraisal"):
 
         ledger: VaultLedger = await VaultLedger.find_by_vault_id(db_session, vault_number)
 
         if (not ledger) or ledger_expired(ledger):
+            logger.debug(f"ledger for vault {vault_number} either doesn't exist or is expired")
             raise LedgerExpiredException()
 
         muggle_money_value = -1
@@ -82,7 +84,9 @@ async def get_muggle_money_value(ledger: VaultLedger, muggle_currency_code: str)
 
 
 async def request_vault_appraisal(vault_number: int):
-    settings = get_settings()
-    get_channel(settings.appraisal_queue)\
-        .basic_publish(exchange='', routing_key=settings.appraisal_routing_key, body=str(vault_number))
+    with tracer.start_as_current_span("Requesting vault appraise"):
+        settings = get_settings()
+        logger.debug(f"requesting an appraise from worker for vault {vault_number}")
+        get_channel(settings.appraisal_queue)\
+            .basic_publish(exchange='', routing_key=settings.appraisal_routing_key, body=str(vault_number))
 

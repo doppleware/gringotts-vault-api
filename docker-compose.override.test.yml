@@ -1,8 +1,15 @@
 version: '3'
-
+# In the test override nothing is public
+# all of the services run internally where the tests
+# are executed
 services:
   gt-rabbitmq:
     container_name: gt-rabbitmq-test
+
+  gt-vault-db:
+    container_name: gt-vault-db-test
+    environment:
+      - SQL_DB=testdb
 
   gt-vault-api:
     container_name: gt-vault-api-test
@@ -14,8 +21,3 @@ services:
         pytest ${PYTEST_ARGUMENTS}
       "
 
-  gt-vault-db:
-    container_name: gt-vault-db-test
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - SQL_DB=testdb
