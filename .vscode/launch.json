@@ -29,7 +29,9 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "gringotts.main:app"
+                "gringotts.main:app",
+                "--port", "8283",
+                "--reload"
             ],
             "jinja": true,
             "justMyCode": false,
