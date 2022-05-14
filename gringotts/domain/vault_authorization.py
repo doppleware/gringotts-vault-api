@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import Depends
 from opentelemetry import trace
 from pydantic import BaseModel
@@ -9,7 +11,7 @@ from gringotts.models.vault import Vault
 from gringotts.models.vault_owner import VaultOwner
 from gringotts.models.vault_key import VaultKey
 from gringotts.schemas.authentication import AuthenticationRequest
-
+logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
 
