@@ -18,7 +18,7 @@
             "name": "Consumer",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/worker/consumer.py",
+            "program": "${workspaceFolder}/worker/main.py",
             "jinja": true,
             "justMyCode": false,
             "console": "integratedTerminal",
