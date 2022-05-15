@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  gt-seed-data:
+    build:
+      context: .
+      dockerfile: ./seed/Dockerfile
+    depends_on:
+      - gt-vault-db
+    environment:
+      - POSTGRES_HOST=gt-vault-db
+      - RABBITMQ_HOST=gt-rabbitmq
+      - OTLP_EXPORTER_URL=host.docker.internal:4317
+    env_file:
+      - .env
+    command: bash -c "
+      PYTHONPATH=. python ./seed/seed_data.py
+      "
+networks:
+  default:
+    name: gringotts-network

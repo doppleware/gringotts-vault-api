@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 from starlette.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED
 
-from tests.api.domain_fixtures import *
+from tests.gringotts.api.domain_fixtures import *
 
 pytestmark = pytest.mark.anyio
 

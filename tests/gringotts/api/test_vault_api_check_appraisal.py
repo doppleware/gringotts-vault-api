@@ -11,11 +11,12 @@ from starlette.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_410_GONE, 
 from gringotts.config import get_settings
 
 pytestmark = pytest.mark.anyio
-from tests.api.domain_fixtures import  *
+from tests.gringotts.api.domain_fixtures import  *
 
 
 class GoblinWorker:
     def __init__(self, channel: BlockingChannel) -> None:
+        self.appraise_request_received = False
         self.appraise_request_received = False
         self.vault_id_received = None
         channel.queue_declare(get_settings().appraisal_queue)
