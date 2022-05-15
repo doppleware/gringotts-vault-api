@@ -35,7 +35,7 @@ trace.set_tracer_provider(provider)
 RequestsInstrumentor().instrument()
 LoggingInstrumentor().instrument(set_logging_format=True)
 AsyncPGInstrumentor().instrument()
-FastAPIInstrumentor().instrument_app(app)
+FastAPIInstrumentor().instrument_app(app, excluded_urls="^(?!/gringotts).*$")
 
 tracer = trace.get_tracer(__name__)
 
