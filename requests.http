@@ -1,15 +1,16 @@
 
-POST http://localhost:8000/v1/moneytransfer/transfer HTTP/1.1
+POST http://localhost:8283/gringotts/vaults/authenticate HTTP/1.1
 content-type: application/json
 
 {
-    "source_account": "bob",
-    "target_account": "bill",
-    "executing_user": "bob", 
-    "amount": 20
+    "vault_owner": "hpotter",
+    "vault_number": "713",
+    "vault_key": "griffindoor"
 
 }
 
+
 ###
 
-http://localhost:8000/v1/nonsense/test
+GET http://localhost:8283/gringotts/vaults/appraisal?vault_id=713
+Authorization: Bearer token_here
