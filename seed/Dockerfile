@@ -12,8 +12,7 @@ RUN set -ex && pip install -r requirements.txt
 
 FROM builder as final
 WORKDIR /app
-COPY ./gringotts/ /app/
-COPY ./tests/ /app/
+COPY ./ /app/
 COPY .env /app/
 
 RUN set -ex && bash -c "eval $(grep 'PYTHONDONTWRITEBYTECODE' .env)"

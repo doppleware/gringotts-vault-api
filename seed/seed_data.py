@@ -83,6 +83,9 @@ async def seed(sm: sessionmaker = None):
     if not sm:
         sm = await create_session_maker()
 
+    if await already_seeded(sm):
+        return
+        
     keys = generate_keys(10000)
     potter_key = VaultKey('griffindoor')
     keys.append(potter_key)
@@ -96,6 +99,15 @@ async def seed(sm: sessionmaker = None):
 
     owners = import_wizards(vaults=vaults)
     await save_all(sm, owners)
+
+async def already_seeded(async_session):
+    async with async_session() as session:
+        session: AsyncSession
+        # make bulk insert
+        harry = await VaultOwner.find(session,'hpotter')
+        if harry:
+            return True
+        return False
 
 
 async def create_session_maker():

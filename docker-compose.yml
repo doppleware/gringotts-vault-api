@@ -63,7 +63,9 @@ services:
       "
 
   gt-vault-api:
-    build: .
+    build:
+      context: .
+      dockerfile: ./gringotts/Dockerfile    
     profiles: ["standalone", "test"]
     container_name: gt-vault-api
     depends_on:
