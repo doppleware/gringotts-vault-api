@@ -33,7 +33,7 @@ class VaultLedger(Base):
         :param number:
         :return:
         """
-        with tracer.start_as_current_span('Retrieving vault by number'):
+        with tracer.start_as_current_span('Retrieving ledger by vault number'):
             stmt = sqlalchemy.select(cls).where(cls.vault_number == number)
             result = await db_session.execute(stmt)
             instance = result.scalars().first()

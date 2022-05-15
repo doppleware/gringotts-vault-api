@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from opentelemetry.instrumentation.digma import DigmaConfiguration
 
@@ -5,7 +6,6 @@ from gringotts.api.vault_service import router as vault_router
 from gringotts.config import get_settings
 from gringotts.database import engine
 from gringotts.models.base import Base
-from gringotts.utils import get_logger
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource, SERVICE_NAME
 from opentelemetry.sdk.trace import TracerProvider
@@ -17,7 +17,7 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Gringotts Vault API", version="0.3")
 

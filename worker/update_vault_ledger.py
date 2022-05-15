@@ -1,7 +1,7 @@
 
 import psycopg2
 import logging
-
+from datetime import datetime
 from opentelemetry import trace
 
 from appraise import Appraisal
@@ -17,6 +17,6 @@ def update_vault_appraisal(appraisal :Appraisal, vault_number:int):
         logging.debug(f'Running query to update the ledger record for {str(vault_number)}: db: {settings.pg_db} user={settings.pg_user} host={settings.pg_host}')
         conn = psycopg2.connect(f"dbname={settings.pg_db} user={settings.pg_user} host={settings.pg_host} password={settings.pg_pass}")
         cur = conn.cursor()
-        query = f"UPDATE gringotts.vault_ledgers SET sickles={appraisal.sickles}, galleons={appraisal.galleons},knuts={appraisal.knuts} WHERE vault_number ='{vault_number}' "
+        query = f"UPDATE gringotts.vault_ledgers SET sickles={appraisal.sickles}, galleons={appraisal.galleons},knuts={appraisal.knuts}, last_appraised={datetime.now()} WHERE vault_number ='{vault_number}' "
         cur.execute(query)
  

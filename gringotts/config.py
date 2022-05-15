@@ -1,11 +1,10 @@
+import logging
 import os
 from functools import lru_cache
 
 from pydantic import BaseSettings
 
-from gringotts.utils import get_logger
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):

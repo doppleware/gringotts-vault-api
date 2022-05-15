@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
 from gringotts import config
 
@@ -19,6 +20,9 @@ engine = create_async_engine(
 # expire_on_commit=False will prevent attributes from being expired
 # after commit.
 async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+SQLAlchemyInstrumentor().instrument(
+    engine=engine.sync_engine
+)
 
 
 # Dependency

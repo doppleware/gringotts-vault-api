@@ -93,11 +93,12 @@ async def _ensure_owner_exists(db_session, vault_owner:str):
 async def _search_for_key_record(db_session: AsyncSession, key: str):
     # Purposely inefficient... job security?
     with tracer.start_as_current_span("Retrieiving the key record"):
-        keys = await VaultKey.all(db_session)
+        vaults = await Vault.all(db_session)
         found_key = None
-        for key_record in keys:
-            key_record: VaultKey
-            if key_record.key == key:
+        for vault in vaults:
+            vault: Vault
+            vault_key = await VaultKey.find(db_session, vault.vault_key_id)
+            if vault_key.key == key:
                 found_key = key
 
         return found_key

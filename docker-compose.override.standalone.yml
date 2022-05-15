@@ -8,7 +8,8 @@ services:
 
   gt-vault-db:
     container_name: gt-vault-db-internal
-  
+    ports:
+      - 5432:5432
   gt-vault-api:
     ports:
       - 8283:8080

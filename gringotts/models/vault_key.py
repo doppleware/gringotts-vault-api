@@ -33,12 +33,3 @@ class VaultKey(Base):
             instance = result.scalars().first()
             return instance
 
-    @classmethod
-    async def all(cls, db_session: AsyncSession):
-        """
-
-        :param db_session:
-        :return:
-        """
-        result = await db_session.execute(select(cls))
-        return result.scalars()

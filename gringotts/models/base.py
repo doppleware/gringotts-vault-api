@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
+from sqlalchemy import select
 
 
 @as_declarative()
@@ -62,5 +63,15 @@ class Base:
         for k, v in kwargs.items():
             setattr(self, k, v)
         await self.save(db_session)
+
+    @classmethod
+    async def all(cls, db_session: AsyncSession):
+        """
+
+        :param db_session:
+        :return:
+        """
+        result = await db_session.execute(select(cls))
+        return result.scalars()
 
 
