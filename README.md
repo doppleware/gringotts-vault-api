@@ -55,7 +55,7 @@ This will import in some Wizards from a data source I
 found [online](https://www.kaggle.com/datasets/gulsahdemiryurek/harry-potter-dataset),
 to make it a little easier to work with the API 
 ```commandline
-PYTHONPATH=. python ./tests/seed/seed_data.py
+docker compose -f docker-compose.seed.yml up -d
 ```
 
 #### 4. Generate some activity to observe
