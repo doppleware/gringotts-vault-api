@@ -93,6 +93,7 @@ async def seed(sm: sessionmaker = None):
 
     current_max_vault = await get_max_vault_number(sm)
     vaults = generate_vaults(1000, keys, current_max_vault + 1) 
+      
     add_special_vaults(vaults)
     await save_all(sm, vaults.values())
 

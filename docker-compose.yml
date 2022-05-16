@@ -3,9 +3,9 @@ version: '3'
 services:
 
   gt-rabbitmq:
+    image: rabbitmq:3-management-alpine
     profiles: [ "develop","standalone","test" ]
     container_name: gt-rabbitmq
-    image: rabbitmq:3-management-alpine
     volumes:
       - rabbitmq_gt_data:/var/lib/rabbitmq/
       - rabbitmq_gt_log:/var/log/rabbitmq/
