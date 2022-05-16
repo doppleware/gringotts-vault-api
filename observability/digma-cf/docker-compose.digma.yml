@@ -2,9 +2,6 @@ version: '3.6'
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    ports:
-      - "15672"
-      - "5672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq/
       - rabbitmq_log:/var/log/rabbitmq/
@@ -13,8 +10,6 @@ services:
       - RABBITMQ_DEFAULT_PASS=admin
   postgres:
     image: postgres
-    ports:
-      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -23,14 +18,10 @@ services:
       - POSTGRES_PASSWORD=postgres
   redis:
     image: redis:alpine
-    ports:
-      - "6379"
     volumes:
       - redis_data:/data
   influxdb:
     image: influxdb:latest
-    ports:
-      - "8086"
     volumes:
       - influxdb_data:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2
@@ -51,6 +42,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - CacheSettings__RedisConnection=${REDIS_CONNECTION:-redis}
+      - ConnectionStrings__Postgres=Server=${POSTGRES_SERVER:-postgres};Port=${POSTGRES_SERVER_PORT:-5432};Database=digma_analytics;User Id=${POSTGRES_USER:-postgres};Password=${POSTGRES_PWD:-postgres};
       - influx2__Url=http://${INFLUXDB_URL:-influxdb}:8086
       - RabbitMq__Host=${RabbitMq_Host:-rabbitmq}
       - RabbitMq__Username=${RabbitMq_Username:-admin}
@@ -75,8 +67,6 @@ services:
       - influxdb
   digma-analytics:
     image: digmatic/digma-analytics
-    ports:
-      - "5052"
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - influx2__Url=http://${INFLUXDB_URL:-influxdb}:8086

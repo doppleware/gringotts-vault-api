@@ -44,6 +44,7 @@ opentelemetry-instrumentation-requests==0.30b1
 opentelemetry-instrumentation-logging==0.30b1
 opentelemetry-instrumentation-asyncpg==0.30b1
 opentelemetry-instrumentation-sqlalchemy==0.30b1
+opentelemetry-instrumentation-httpx==0.30b1
 opentelemetry-instrumentation-pika==0.30b1
 opentelemetry-instrumentation-digma==0.5.17
 python-dotenv==0.20.0

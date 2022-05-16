@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 
 from opentelemetry import trace
 from pika.adapters.blocking_connection import BlockingChannel
@@ -13,9 +14,10 @@ tracer = trace.get_tracer(__name__)
 def go_appraise_vault(ch, method, properties, body):
     with tracer.start_as_current_span("handling appraisal request for vault"):
         # Its not that urgent
+        time.sleep(1)
+
         vault_id = body.decode('utf-8')
         logger.debug(f'received request to appraise vault {vault_id}')
-        asyncio.sleep(1)
         appraisal: Appraisal = appraise()
         update_vault_appraisal(appraisal=appraisal, vault_number=vault_id)
 

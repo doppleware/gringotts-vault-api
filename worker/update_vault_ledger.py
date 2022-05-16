@@ -31,3 +31,4 @@ def update_vault_appraisal(appraisal: Appraisal, vault_number: int):
             f"dbname={settings.pg_db} user={settings.pg_user} host={settings.pg_host} password={settings.pg_pass}")
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()

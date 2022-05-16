@@ -16,7 +16,7 @@ class Vault(Base):
 
     vault_number = Column(Integer, nullable=False, primary_key=True, unique=True)
 
-    owner = relationship("VaultOwner", back_populates="vault", lazy="joined", innerjoin=True, uselist=False)
+    owner = relationship("VaultOwner", back_populates="vault", lazy="joined", innerjoin=False, uselist=False)
     ledger = relationship("VaultLedger", back_populates="vault")
 
     vault_key_id = Column(String, ForeignKey('gringotts.vault_keys.key'))
