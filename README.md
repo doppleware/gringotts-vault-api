@@ -55,7 +55,7 @@ This will import in some Wizards from a data source I
 found [online](https://www.kaggle.com/datasets/gulsahdemiryurek/harry-potter-dataset),
 to make it a little easier to work with the API 
 ```commandline
-docker compose -f docker-compose.seed.yml up -d
+docker compose -f ./docker-compose.seed.yml up --attach gt-seed-data
 ```
 
 #### 4. Generate some activity to observe
@@ -81,6 +81,7 @@ We'll use Digma to demonstrate continuous feedback.
 
 2. Upon installing the [Digma extension](https://marketplace.visualstudio.com/items?itemName=digma.digma) open your vscode and select the Digma icon to see information in the context of the code.
 
+<img width="972" alt="image" src="https://user-images.githubusercontent.com/93863/169159733-ddf76bdf-8607-429c-bc87-90f2801048b4.png">
 
 
 ### Installing requirements locally
