@@ -5,7 +5,8 @@ on:
   workflow_dispatch:
   release:
     types: [published]
-
+permissions:
+  contents: read
 env:
   SERVICE: gt-vault-api
   AWS_REGION: eu-west-1
@@ -17,7 +18,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        token: ${{ secrets.GH_PAT }}
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
     - uses: ./.github/workflows/composite/build-push
       with:
         service: ${{ env.SERVICE }}
