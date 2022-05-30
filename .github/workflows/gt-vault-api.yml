@@ -1,0 +1,26 @@
+name: Deploy gt-vault-api to Amazon ECR
+
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+env:
+  SERVICE: gt-vault-api
+  AWS_REGION: eu-west-1
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: ./.github/workflows/composite/build-push
+      with:
+        service: ${{ env.SERVICE }}
+        registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: ${{ env.AWS_REGION }}
+        ecr_repository: "gt-vault-api"
