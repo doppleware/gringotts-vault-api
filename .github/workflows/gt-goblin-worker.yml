@@ -1,0 +1,29 @@
+name: Deploy gt-goblin-worker to Amazon ECR
+
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+permissions:
+  contents: read
+env:
+  SERVICE: gt-goblin-worker
+  AWS_REGION: eu-west-1
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: ./.github/workflows/composite/build-push
+      with:
+        service: ${{ env.SERVICE }}
+        registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: ${{ env.AWS_REGION }}
+        ecr_repository: "gt-goblin-worker"
