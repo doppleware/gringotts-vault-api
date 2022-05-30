@@ -1,0 +1,61 @@
+
+name: "Build and push image"
+description: "Builds and pushes an image to a registry"
+
+inputs:
+  service:
+    description: "Service to build"
+    required: true
+  registry_endpoint:
+    description: "Image registry repo e.g. ###.dkr.ecr.###.amazonaws.com"
+    required: true
+  ecr_repository:
+    description: "ECR repository name"
+    required: true
+  aws_access_key_id:
+    description: "AWS_ACCESS_KEY_ID"
+    required: true
+  aws_secret_access_key:
+    description: "AWS_SECRET_ACCESS_KEY"
+    required: true
+  aws_region:
+    description: "AWS_REGION"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-access-key-id: ${{ inputs.aws_access_key_id }}
+      aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+      aws-region: ${{ inputs.aws_region }}
+
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v1
+
+  - name: Set branch name as env variable
+    run: |
+      currentbranch=$(echo ${GITHUB_REF##*/})
+      echo "running on $currentbranch"
+      echo "BRANCH=$currentbranch" >> $GITHUB_ENV
+    shell: bash
+  - name: Compose build ${{ inputs.service }}
+    shell: bash
+    run: |
+      # Build a docker container and
+      # push it to ECR so that it can
+      # be deployed in AWS.
+      sudo -E docker-compose -f docker-compose.yml -f docker-compose.override.standalone.yml build ${{ inputs.service }}
+      sudo -E docker-compose -f docker-compose.yml -f docker-compose.override.standalone.yml push ${{ inputs.service }}
+      
+      MANIFEST="$(aws ecr batch-get-image --repository-name ${{ inputs.ecr_repository }} --image-ids imageTag="${{ env.TAG }}" --output json | jq --raw-output '.images[0].imageManifest')"
+      aws ecr put-image --repository-name ${{ inputs.ecr_repository }} --image-tag latest --image-manifest "$MANIFEST"
+      echo "::set-output name=image::${{ inputs.registry_endpoint }}/${{ inputs.ecr_repository }}:${{ env.TAG }}"
+
+    working-directory: .
+    env:
+      TAG: ${{ github.sha }}
+      REGISTRY: ${{ inputs.registry_endpoint }}
