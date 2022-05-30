@@ -1,4 +1,3 @@
-
 name: "Build and push image"
 description: "Builds and pushes an image to a registry"
 
