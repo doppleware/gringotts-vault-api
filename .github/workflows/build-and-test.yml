@@ -43,6 +43,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install required libs
         run: pip install -r ./gringotts/requirements.txt
+      - name: Install worker libs
+        run: pip install -r ./worker/requirements.txt
       - name: Run tests
         run: pytest
         env:
