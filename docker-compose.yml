@@ -48,8 +48,8 @@ services:
     container_name: gt-goblin-worker
     image: ${REGISTRY:-gringotts}/gt-goblin-worker:${TAG:-latest}
     build:
-      context: ./worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./worker/Dockerfile  
     depends_on:
       - gt-vault-db
       - gt-rabbitmq
@@ -60,7 +60,7 @@ services:
     env_file:
       - .env
     command: bash -c "
-      python ./main.py
+      PYTHONPATH=. python ./worker/main.py
       "
 
   gt-vault-api:

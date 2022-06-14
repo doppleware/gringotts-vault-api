@@ -17,6 +17,7 @@ from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from prometheus_fastapi_instrumentator import Instrumentator
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,8 @@ exporter = OTLPSpanExporter(endpoint=get_settings().otlp_exporter_url, insecure=
 provider = TracerProvider(resource=resource)
 provider.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(provider)
+
+Instrumentator().instrument(app).expose(app)
 
 
 RequestsInstrumentor().instrument()

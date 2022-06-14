@@ -1,28 +1,26 @@
-import asyncio
 import logging
-import time
 
 from opentelemetry import trace
 from pika.adapters.blocking_connection import BlockingChannel
 
-from appraise import Appraisal, appraise
-from update_vault_ledger import update_vault_appraisal
+from worker.jobs.appraise_vault import go_appraise_vault
+
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
+class GoblinWorkers:
 
-def go_appraise_vault(ch, method, properties, body):
-    with tracer.start_as_current_span("handling appraisal request for vault"):
-        # Its not that urgent
-        time.sleep(1)
+    def __init__(self, channel: BlockingChannel) -> None:
+        self.channel = channel
 
-        vault_id = body.decode('utf-8')
-        logger.debug(f'received request to appraise vault {vault_id}')
-        appraisal: Appraisal = appraise()
-        update_vault_appraisal(appraisal=appraisal, vault_number=vault_id)
+    def __enter__(self):
+        pass
+    
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        self.channel.stop_consuming()
 
+    def goblins_wait_for_work(self):
 
-def goblins_wait_for_work(channel: BlockingChannel):
-    channel.basic_consume(queue='appraisal_requests', on_message_callback=go_appraise_vault, auto_ack=True)
-    channel.start_consuming()
+        self.channel.basic_consume(queue='appraisal_requests', on_message_callback=go_appraise_vault, auto_ack=True)
+        self.channel.start_consuming()
 
