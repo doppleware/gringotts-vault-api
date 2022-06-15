@@ -40,10 +40,7 @@ async def start_db():
     # clean-up pooled connections
     await engine.dispose()
 
-@pytest.fixture
-async def goblin_channel(request) -> BlockingChannel:
-    settings = get_settings()
-    return create_queue_channel(settings)
+
 
 
 @pytest_asyncio.fixture

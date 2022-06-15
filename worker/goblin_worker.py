@@ -14,7 +14,7 @@ class GoblinWorkers:
         self.channel = channel
 
     def __enter__(self):
-        pass
+        return self
     
     def __exit__(self, exc_type, exc_value, exc_tb):
         self.channel.stop_consuming()
@@ -22,5 +22,4 @@ class GoblinWorkers:
     def goblins_wait_for_work(self):
 
         self.channel.basic_consume(queue='appraisal_requests', on_message_callback=go_appraise_vault, auto_ack=True)
-        self.channel.start_consuming()
 

@@ -15,8 +15,6 @@ from gringotts.models.vault_key import VaultKey
 from gringotts.schemas.authentication import AuthenticationRequest
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
-lock = threading.Lock()
-
 
 class CreatureNotAuthenticatedException(Exception):
     def __init__(self, reason: str):

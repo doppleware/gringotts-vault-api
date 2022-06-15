@@ -9,6 +9,10 @@ from worker.main import setup_observability
 from worker.queueing import create_queue_channel
 from pika.adapters.blocking_connection import BlockingChannel
 
+@pytest.fixture
+def goblin_channel() -> BlockingChannel:
+    settings = get_settings()
+    return create_queue_channel(settings)
 
 @pytest.fixture()
 def goblin_workers_listening(goblin_channel: BlockingChannel):
