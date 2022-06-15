@@ -11,7 +11,7 @@ from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.digma import DigmaConfiguration
 from worker.config import get_settings
-from goblin_worker import GoblinWorkers
+from worker.goblin_worker import GoblinWorkers
 
 LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 logging.basicConfig(level=LOGLEVEL)
