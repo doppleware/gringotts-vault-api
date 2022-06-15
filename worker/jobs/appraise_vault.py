@@ -9,7 +9,7 @@ import threading
 
 from pydantic import BaseModel 
 
-from config import get_settings
+from worker.config import get_settings
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
