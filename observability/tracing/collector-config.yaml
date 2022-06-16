@@ -9,6 +9,8 @@ exporters:
     endpoint: "jaeger:14250"
     tls:
       insecure: true
+  prometheus:
+    endpoint: "0.0.0.0:8889"
   otlp/digma:
     endpoint: ${OTLP_EXPORTER_DIGMA_COLLECTOR_API}
     tls:
@@ -22,4 +24,8 @@ service:
     traces:
       receivers: [otlp]
       exporters: [otlp/digma, jaeger]
+      processors: [batch]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus]
       processors: [batch]

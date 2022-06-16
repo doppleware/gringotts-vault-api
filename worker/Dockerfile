@@ -2,7 +2,7 @@
 FROM python:3.8.13-buster as builder
 
 # Set environment variables
-COPY requirements.txt requirements.txt
+COPY ./worker/requirements.txt requirements.txt
 
 # Install pipenv
 RUN set -ex && pip install --upgrade pip

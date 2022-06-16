@@ -1,4 +1,6 @@
+import asyncio
 import logging
+import threading
 
 from fastapi import Depends
 from opentelemetry import trace
@@ -13,7 +15,6 @@ from gringotts.models.vault_key import VaultKey
 from gringotts.schemas.authentication import AuthenticationRequest
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
-
 
 class CreatureNotAuthenticatedException(Exception):
     def __init__(self, reason: str):
@@ -92,6 +93,7 @@ async def _ensure_owner_exists(db_session, vault_owner:str):
 
 async def _search_for_key_record(db_session: AsyncSession, key: str):
     # Purposely inefficient... job security?
+    
     with tracer.start_as_current_span("Retrieiving the key record"):
         vaults = await Vault.all(db_session)
         found_key = None

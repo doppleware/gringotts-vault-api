@@ -3,7 +3,7 @@ import time
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.exceptions import AMQPConnectionError
 
-from config import Settings
+from worker.config import Settings
 from pika.credentials import PlainCredentials
 from opentelemetry.instrumentation.pika import PikaInstrumentor
 import pika

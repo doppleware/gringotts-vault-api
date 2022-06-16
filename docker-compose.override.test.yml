@@ -18,6 +18,6 @@ services:
       - APPRAISAL_QUEUE='test_appraisal_requests'
       - APPRAISAL_ROUTING_KEY='test_appraisal_requests'
     command: bash -c "
-        pytest ${PYTEST_ARGUMENTS}
+        pytest ./tests/gringotts ${PYTEST_ARGUMENTS}
       "
 

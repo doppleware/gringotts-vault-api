@@ -17,7 +17,9 @@ class Settings(BaseSettings):
     rabbit_host: str = os.getenv("RABBITMQ_HOST", "")
 
     otlp_exporter_url: str = os.getenv("OTLP_EXPORTER_URL", "")
-
+    
+    appraisal_queue: str = os.getenv("APPRAISAL_QUEUE", "")
+    appraisal_routing_key: str = os.getenv("APPRAISAL_ROUTING_KEY", "")
 
 @lru_cache()
 def get_settings():

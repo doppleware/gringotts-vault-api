@@ -49,3 +49,6 @@ opentelemetry-instrumentation-pika==0.30b1
 opentelemetry-instrumentation-digma==0.5.17
 python-dotenv==0.20.0
 retry==0.9.2
+prometheus-fastapi-instrumentator==5.8.1
+
+

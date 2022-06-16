@@ -22,6 +22,10 @@ services:
       - redis_data:/data
   influxdb:
     image: influxdb:latest
+
+    ports:
+      - "8086:8086"
+
     volumes:
       - influxdb_data:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2
