@@ -118,7 +118,7 @@ To run the tests via docker compose, use the
  docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --abort-on-container-exit --attach gt-vault-api
  ```
 
-To run the tests with some seeded data to see how the system behaves with data in place, use:
+To run the tests with some seeded data to see how the system behaves with data in place, you can use:
 
 ```commandline
 PYTEST_ARGUMENTS="--seed-data true" docker compose --profile test -f docker-compose.yml -f docker-compose.override.test.yml up --abort-on-container-exit --attach gt-vault-api --abort-on-container-exit
