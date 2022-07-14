@@ -86,13 +86,13 @@ async def seed(sm: sessionmaker = None):
     if await already_seeded(sm):
         return
         
-    keys = generate_keys(10000)
+    keys = generate_keys(100)
     potter_key = VaultKey('griffindoor')
     keys.append(potter_key)
     await save_all(sm, keys)
 
     current_max_vault = await get_max_vault_number(sm)
-    vaults = generate_vaults(1000, keys, current_max_vault + 1) 
+    vaults = generate_vaults(100, keys, current_max_vault + 1) 
       
     add_special_vaults(vaults)
     await save_all(sm, vaults.values())

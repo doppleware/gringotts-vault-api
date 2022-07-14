@@ -32,11 +32,12 @@ services:
     ports:
       - "0.0.0.0:4317:4317" # OTLP receiver
       - "0.0.0.0:8889:8889" # METRICS
-
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - jaeger
     environment:
-      - OTLP_EXPORTER_DIGMA_COLLECTOR_API=digma-collector-api:5050
+      - OTLP_EXPORTER_DIGMA_COLLECTOR_API=host.docker.internal:5050
 
 networks:
   default:

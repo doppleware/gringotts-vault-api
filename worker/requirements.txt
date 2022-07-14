@@ -9,3 +9,4 @@ pika==1.2.0
 psycopg2-binary
 pydantic
 retry
+protobuf~=3.20
