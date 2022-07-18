@@ -69,6 +69,7 @@ Since we populated some data you can use the following details:
 
 Notice that it takes some time to process, we'll look into that in a sec.
 
+
 #### 5. Install the IDE Extension
 
 Install the [Digma extension](https://marketplace.visualstudio.com/items?itemName=digma.digma) on your local IDE.
