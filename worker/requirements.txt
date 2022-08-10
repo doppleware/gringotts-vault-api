@@ -6,7 +6,7 @@ opentelemetry-instrumentation-pika==0.30b1
 opentelemetry-instrumentation-digma==0.5.17
 python-dotenv
 pika==1.2.0
-psycopg2-binary
+psycopg2>= 2.7.3.1
 pydantic
 retry
 protobuf~=3.20

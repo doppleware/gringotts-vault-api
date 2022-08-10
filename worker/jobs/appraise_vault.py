@@ -55,7 +55,7 @@ def _update_vault_appraisal(appraisal: Appraisal, vault_number: int):
                     f"sickles={appraisal.sickles}, knuts={appraisal.knuts}, galleons={appraisal.galleons};"
 
             settings = get_settings()
-            logging.debug(
+            logging.error(
                 f'Running query to update the ledger record for {str(vault_number)}: db: {settings.pg_db} user={settings.pg_user} host={settings.pg_host}')
             conn = psycopg2.connect(
                 f"dbname={settings.pg_db} user={settings.pg_user} host={settings.pg_host} password={settings.pg_pass}")

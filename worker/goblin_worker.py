@@ -20,6 +20,8 @@ class GoblinWorkers:
         self.channel.stop_consuming()
 
     def goblins_wait_for_work(self):
+        logging.error('channel waiting')
 
         self.channel.basic_consume(queue='appraisal_requests', on_message_callback=go_appraise_vault, auto_ack=True)
+        self.channel.start_consuming()
 

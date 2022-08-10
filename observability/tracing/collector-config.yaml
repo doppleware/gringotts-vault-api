@@ -5,6 +5,9 @@ receivers:
       http:
 
 exporters:
+  logzio:
+    account_token: "BIFvpvjcLuXhcAgbosgiVwjgCZXSutZt"
+    region: "us"
   jaeger:
     endpoint: "jaeger:14250"
     tls:
@@ -23,7 +26,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [otlp/digma, jaeger]
+      exporters: [otlp/digma, jaeger, logzio]
       processors: [batch]
     metrics:
       receivers: [otlp]
