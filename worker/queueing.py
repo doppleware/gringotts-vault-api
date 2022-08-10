@@ -14,7 +14,7 @@ from retry import retry
 def create_queue_channel(settings: Settings) -> BlockingChannel:
     pika_instrumentation = PikaInstrumentor()
     cr = PlainCredentials(settings.rabbit_user, settings.rabbit_pass)
-    logging.debug(f'Connecting to RabbitMQ: {settings.rabbit_user}/{settings.rabbit_pass}:{settings.rabbit_host}')
+    logging.error(f'Connecting to RabbitMQ: {settings.rabbit_user}/{settings.rabbit_pass}:{settings.rabbit_host}')
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.rabbit_host, credentials=cr))
     channel = connection.channel()
