@@ -46,7 +46,7 @@ jobs:
       - name: Install worker libs
         run: pip install -r ./worker/requirements.txt
       - name: Run tests
-        run: pytest
+        run: pytest ./tests/gringotts
         env:
           PYTHONDONTWRITEBYTECODE: 1
           PYTHONUNBUFFERED: 1
