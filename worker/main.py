@@ -28,7 +28,7 @@ def main():
 def setup_observability(settings):
     resource = Resource.create(attributes={SERVICE_NAME: 'goblin_worker'})
     resource = DigmaConfiguration().trace_this_package()\
-                    .set_environment("Dev").resource.merge(resource)
+                    .resource.merge(resource)
     exporter = OTLPSpanExporter(endpoint=settings.otlp_exporter_url, insecure=True)
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(BatchSpanProcessor(exporter))
