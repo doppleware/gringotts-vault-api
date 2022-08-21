@@ -90,3 +90,4 @@ async def request_vault_appraisal(vault_number: int):
         get_channel(settings.appraisal_queue)\
             .basic_publish(exchange='', routing_key=settings.appraisal_routing_key, body=str(vault_number))
 
+

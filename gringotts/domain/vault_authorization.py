@@ -1,7 +1,8 @@
 import asyncio
 import logging
 import threading
-
+import time
+import asyncio
 from fastapi import Depends
 from opentelemetry import trace
 from pydantic import BaseModel
@@ -39,6 +40,7 @@ async def create_vault_owner_api_key(vault_owner: VaultOwner):
 async def authorize_vault_owner_vault_access(db_session: AsyncSession, vault_owner_id :str, vault_id: int):
 
     with tracer.start_as_current_span("Authorize vault owner for access"):
+        await asyncio.sleep(10)
         owner = await VaultOwner.find(db_session, vault_owner_id)
         await _ensure_owns_requested_vault(owner, vault_id)
 
