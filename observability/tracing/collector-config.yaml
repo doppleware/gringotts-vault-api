@@ -23,7 +23,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [otlp/digma, jaeger, logzio]
+      exporters: [otlp/digma, jaeger]
       processors: [batch]
     metrics:
       receivers: [otlp]
