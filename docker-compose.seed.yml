@@ -5,8 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./seed/Dockerfile
-    depends_on:
-      - gt-vault-db
     environment:
       - POSTGRES_HOST=gt-vault-db
       - RABBITMQ_HOST=gt-rabbitmq
