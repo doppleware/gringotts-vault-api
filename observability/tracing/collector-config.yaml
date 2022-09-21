@@ -5,9 +5,6 @@ receivers:
       http:
 
 exporters:
-  logzio:
-    account_token: "BIFvpvjcLuXhcAgbosgiVwjgCZXSutZt"
-    region: "us"
   jaeger:
     endpoint: "jaeger:14250"
     tls:
