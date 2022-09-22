@@ -15,7 +15,7 @@ services:
 
 networks:
   default:
-    name: gringotts-network
+    name: tracing-network
 
 volumes:
   pgadmin_data:

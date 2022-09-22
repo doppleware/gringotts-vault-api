@@ -1,6 +1,8 @@
 import logging
 from fastapi import FastAPI
 from opentelemetry.instrumentation.digma import DigmaConfiguration
+from opentelemetry.instrumentation.digma.fastapi import DigmaFastAPIInstrumentor
+
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
 from gringotts.api.vault_service import router as vault_router
@@ -41,6 +43,8 @@ LoggingInstrumentor().instrument(set_logging_format=True)
 AsyncPGInstrumentor().instrument()
 # Exclude URLs that are not a part of the core app like /info
 FastAPIInstrumentor().instrument_app(app, excluded_urls="^(?!http[s]?://.*/gringotts).*$")
+DigmaFastAPIInstrumentor().instrument_app(app)
+
 HTTPXClientInstrumentor().instrument()
 
 tracer = trace.get_tracer(__name__)
