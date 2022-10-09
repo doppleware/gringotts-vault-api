@@ -55,6 +55,11 @@ async def authenticate_vault_key(payload: AuthenticationRequest, db_session: Asy
     return token_response
 
 
+
+
+
+
+
 @router.get("/appraisal", response_model=VaultBalanceResponse, status_code=status.HTTP_200_OK)
 async def get_vault_appraisal(vault_id: str, muggle_currency_code: Optional[str] = None,
                               db_session: AsyncSession = Depends(get_db),
@@ -79,6 +84,15 @@ async def start_new_vault_appraisal(payload: VaultAppraisalRequest,
 
     await _ensure_authorized_to_vault(db_session,owner_access, payload.vault_id)
     await request_vault_appraisal(payload.vault_id)
+
+
+
+
+
+
+
+
+
 
 
 async def _ensure_authorized_to_vault(db_session, owner_access: VaultOwnerAccess, vault_id):

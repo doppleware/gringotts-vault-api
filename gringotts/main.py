@@ -29,7 +29,7 @@ app.include_router(vault_router)
 
 resource = Resource.create(attributes={SERVICE_NAME: 'vault_service'})
 resource = DigmaConfiguration().trace_this_package()\
-                    .set_environment("Dev").resource.merge(resource)
+                    .set_environment("Prod").resource.merge(resource)
 exporter = OTLPSpanExporter(endpoint=get_settings().otlp_exporter_url, insecure=True)
 provider = TracerProvider(resource=resource)
 provider.add_span_processor(BatchSpanProcessor(exporter))
