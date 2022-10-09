@@ -43,7 +43,19 @@ async def authorize_vault_owner_vault_access(db_session: AsyncSession, vault_own
         await _ensure_owns_requested_vault(owner, vault_id)
 
 
+
+
+
+
+
+
+
+
+
+
+
 async def authenticate_vault_owner_and_key(db_session: AsyncSession, vault_owner: str, vault_key: str ):
+   
     with tracer.start_as_current_span("Authenticate vault owner and key"):
         # Owner is known
         owner = await _ensure_owner_exists(db_session, vault_owner)
@@ -78,14 +90,17 @@ async def _ensure_key_matches_records(db_session, vault_key: str):
 
 async def _ensure_owner_has_a_vault(owner):
     # Vault requested is the one that belongs to the requestor
-    vault_id = owner.vault_id
-    if not vault_id:
-        raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't exist")
-    return vault_id
+    with tracer.start_as_current_span("Ensure_owner_has_a_vault"):
+        vault_id = owner.vault_id
+        await asyncio.sleep(40)
+        if not vault_id:
+            raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't exist")
+        return vault_id
 
 
 async def _ensure_owner_exists(db_session, vault_owner:str):
     owner: VaultOwner = await VaultOwner.find(username=vault_owner, db_session=db_session)
+    print("owner" + owner.name)
     if not owner:
         raise CreatureNotAuthenticatedException(f"Creature {vault_owner} isn't a registered owner")
     return owner
