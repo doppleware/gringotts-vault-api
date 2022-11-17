@@ -1,6 +1,11 @@
 version: '3'
 
 services:
+  gt-rabbitmq:
+    container_name: gt-rabbitmq-internal
+
+  gt-vault-db:
+    container_name: gt-vault-db-internal
   gt-seed-data:
     build:
       context: .
@@ -9,6 +14,8 @@ services:
       - POSTGRES_HOST=gt-vault-db
       - RABBITMQ_HOST=gt-rabbitmq
       - OTLP_EXPORTER_URL=host.docker.internal:4317
+    depends_on:
+      - gt-vault-api
     env_file:
       - .env
     command: bash -c "
