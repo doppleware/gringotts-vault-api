@@ -14,3 +14,8 @@ content-type: application/json
 
 GET http://localhost:8283/gringotts/vaults/appraisal?vault_id=713
 Authorization: Bearer token_here
+
+###
+
+
+GET http://localhost:8283/gringotts/vaults/example1 HTTP/1.1

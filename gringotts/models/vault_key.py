@@ -33,3 +33,11 @@ class VaultKey(Base):
             instance = result.scalars().first()
             return instance
 
+        with tracer.start_as_current_span('Test new span'):
+            stmt = select(cls).where(cls.key == key)
+            result = await db_session.execute(stmt)
+            instance = result.scalars().first()
+            return instance
+
+
+

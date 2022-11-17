@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import threading
 
 from fastapi import Depends
 from opentelemetry import trace
@@ -89,20 +88,23 @@ async def _ensure_key_matches_records(db_session, vault_key: str):
 
 
 async def _ensure_owner_has_a_vault(owner):
-    # Vault requested is the one that belongs to the requestor
+    # Vault requested is the one that belongto the requestor
     with tracer.start_as_current_span("Ensure_owner_has_a_vault"):
         vault_id = owner.vault_id
-        await asyncio.sleep(40)
+        await asyncio.sleep(4)
         if not vault_id:
-            raise CreatureNotAuthenticatedException(f"Specified vault_id {vault_id} doesn't exist")
+            raise CreatureNotAuthenticatedException(
+                f"Specified vault_id {vault_id} doesn't exist")
         return vault_id
 
 
 async def _ensure_owner_exists(db_session, vault_owner:str):
-    owner: VaultOwner = await VaultOwner.find(username=vault_owner, db_session=db_session)
+    owner: VaultOwner = await VaultOwner.find(username=vault_owner,
+                                              db_session=db_session)
     print("owner" + owner.name)
     if not owner:
-        raise CreatureNotAuthenticatedException(f"Creature {vault_owner} isn't a registered owner")
+        raise CreatureNotAuthenticatedException(
+            f"Creature {vault_owner} isn't a registered owner")
     return owner
 
 
