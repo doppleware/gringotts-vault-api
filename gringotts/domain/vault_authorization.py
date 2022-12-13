@@ -57,6 +57,8 @@ async def authenticate_vault_owner_and_key(db_session: AsyncSession, vault_owner
    
     with tracer.start_as_current_span("Authenticate vault owner and key"):
         # Owner is known
+        # await asyncio.sleep(6)
+
         owner = await _ensure_owner_exists(db_session, vault_owner)
 
         await _ensure_owner_has_a_vault(owner)
@@ -91,7 +93,6 @@ async def _ensure_owner_has_a_vault(owner):
     # Vault requested is the one that belongto the requestor
     with tracer.start_as_current_span("Ensure_owner_has_a_vault"):
         vault_id = owner.vault_id
-        await asyncio.sleep(4)
         if not vault_id:
             raise CreatureNotAuthenticatedException(
                 f"Specified vault_id {vault_id} doesn't exist")
@@ -113,9 +114,10 @@ async def _search_for_key_record(db_session: AsyncSession, key: str):
     
     with tracer.start_as_current_span("Retrieiving the key record"):
         vaults = await Vault.all(db_session)
-        found_key = None
+        found_key = None 
         for vault in vaults:
             vault: Vault
+            all_vaults = await Vault.all(db_session)
             vault_key = await VaultKey.find(db_session, vault.vault_key_id)
             if vault_key.key == key:
                 found_key = key
