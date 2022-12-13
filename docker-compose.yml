@@ -4,7 +4,7 @@ services:
 
   gt-rabbitmq:
     image: rabbitmq:3-management-alpine
-    profiles: [ "develop","standalone","test" ]
+    profiles: [ "develop","standalone","test","seed" ]
     container_name: gt-rabbitmq
     volumes:
       - rabbitmq_gt_data:/var/lib/rabbitmq/
@@ -21,7 +21,7 @@ services:
       retries: 3
 
   gt-vault-db:
-    profiles: [ "develop","standalone","test" ]
+    profiles: [ "develop","standalone","test","seed" ]
     container_name: gt-vault-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -68,7 +68,7 @@ services:
     build:
       context: .
       dockerfile: ./gringotts/Dockerfile    
-    profiles: ["standalone", "test"]
+    profiles: ["standalone", "test", "seed"]
     container_name: gt-vault-api
     depends_on:
       - gt-vault-db

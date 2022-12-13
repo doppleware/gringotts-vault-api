@@ -45,19 +45,3 @@ jobs:
         run: pip install -r ./gringotts/requirements.txt
       - name: Install worker libs
         run: pip install -r ./worker/requirements.txt
-      - name: Run tests
-        run: pytest ./tests/gringotts
-        env:
-          PYTHONDONTWRITEBYTECODE: 1
-          PYTHONUNBUFFERED: 1
-          POSTGRES_HOST: 127.0.0.1
-          RABBITMQ_HOST: 127.0.0.1
-          RABBITMQ_PASSWORD: admin
-          RABBITMQ_USER: admin
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: secret
-          POSTGRES_DB: testdb
-          POSTGRES_TEST_DB: testdb
-          APPRAISAL_QUEUE: 'test_appraisal_requests'
-          APPRAISAL_ROUTING_KEY: 'test_appraisal_requests'
-

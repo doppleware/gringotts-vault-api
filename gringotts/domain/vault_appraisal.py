@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import json
 import logging
@@ -14,6 +15,7 @@ from gringotts.models.vault_ledger import VaultLedger
 from gringotts.schemas.vault_balance import VaultBalanceResponse
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
+lock = asyncio.Lock()
 
 LEDGER_EXPIRATION_IN_DAYS = 10
 
@@ -33,14 +35,16 @@ class MuggleCurrencies(Enum):
 
 async def get_muggle_exchange_rates(currency_code: str):
     with tracer.start_as_current_span("Retrieving muggle exchange rate"):
-        async with AsyncClient(
-                headers={"Content-Type": "application/json"},
-        ) as client:
-            response = await client.get(get_settings().muggle_exchange_api)
-            exchange_rates_list = json.loads(response.text)
-            muggle_exchange_rate = \
-                next((e for e in exchange_rates_list if e["currency_code"] == currency_code.upper()), None)
-            return muggle_exchange_rate
+        async with lock:
+            async with AsyncClient(
+                    headers={"Content-Type": "application/json"},
+            ) as client:
+                    await asyncio.sleep(1)
+                    response = await client.get(get_settings().muggle_exchange_api)
+                    exchange_rates_list = json.loads(response.text)
+                    muggle_exchange_rate = \
+                        next((e for e in exchange_rates_list if e["currency_code"] == currency_code.upper()), None)
+                    return muggle_exchange_rate
 
 
 def ledger_expired(ledger: VaultLedger) -> bool:
